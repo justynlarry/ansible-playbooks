@@ -1,0 +1,13 @@
+---
+
+- hosts:  all
+  become: true
+  tasks:
+
+  - name: Update apt index files from repositories
+    apt:
+      update_cache: yes
+
+  - name:  Upgrade currently installed packages from repositories
+    apt:
+      upgrade: yes
