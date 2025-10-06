@@ -5,6 +5,7 @@
   tasks:
 
   - name: Update apt index files from repositories
+    tags: always
     apt:
       update_cache: yes
       upgrade: yes
@@ -15,9 +16,21 @@
   tasks:
 
   - name: Install Apache on Web Servers
+    tags: apache2,ubuntu,debian
     apt:
       name:
         - apache2
         - libapache2-mod-php
+      state: latest
+    when: ansible_distribution in ["Debian", "Ubuntu"]
+
+- hosts: file-servers
+  become: true
+  tasks:
+
+  - name: Install samba package
+    tags: samba
+    apt:
+      name: samba
       state: latest
     when: ansible_distribution in ["Debian", "Ubuntu"]
