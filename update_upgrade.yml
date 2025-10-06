@@ -7,9 +7,10 @@
   - name: Update apt index files from repositories
     apt:
       update_cache: yes
+      upgrade: yes
     when: ansible_distribution in ["Debian", "Ubuntu"]
 
-  - name:  Upgrade currently installed packages from repositories
-    apt:
-      upgrade: yes
-    when:  ansible_distribution in ["Debian", "Ubuntu"]
+#  - name:  Upgrade currently installed packages from repositories
+#    apt:
+#      upgrade: yes
+#    when:  ansible_distribution in ["Debian", "Ubuntu"]
