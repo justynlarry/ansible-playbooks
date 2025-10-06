@@ -24,6 +24,16 @@
       state: latest
     when: ansible_distribution in ["Debian", "Ubuntu"]
 
+  - name:  Copy default HTML file for Site
+    tags: apache, http, html
+    copy:
+      src: default_site.html
+      dest: /var/www/html/index.html
+      owner: root
+      group: root
+      mode: 0644
+
+
 - hosts: file-servers
   become: true
   tasks:
