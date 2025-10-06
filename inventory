@@ -1,3 +1,8 @@
+[web-servers]
 dred-user@192.168.0.132
+
+[file-servers]
 ubred-user@192.168.0.107
+
+[system-monitors]
 ubred2-user@192.168.0.108
