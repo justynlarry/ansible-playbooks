@@ -1,0 +1,48 @@
+---
+
+- name: Daily Server Maintenance and Checks
+  hosts: all
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+  - name: install updates (Ubuntu/Debian)
+    tags: always
+    apt:
+      upgrade: yes
+      update_cache: yes
+    when: ansible_distribution in ["Debian", "Ubuntu"]
+
+  tasks:
+    - name: run journalctl command and store output
+      ansible.builtin.command: journalctl -p 3 -xb
+      register: journal_output
+      changed_when: false
+
+    - name: Display problematic logs for each host
+      ansible.builtin.debug:
+        msg: "Host: {{ inventory_hostname }}\nLogs: \n{{ journal_output.stdout }}"
+      when: journal_output.stdout | length > 0
+
+    - name: Add date header to files
+      ansible.builtin.set_fact:
+        current_datetime: "{{ lookup('pipe', 'date +%Y-%m-%d') }}"
+      run_once: true
+      delegate_to: localhost
+
+    - name: Create a file with hostname and logs on Ansible Control Node
+      ansible.builtin.copy:
+        dest:  "/tmp/problem_logs_report_{{ current_datetime }}.txt"
+        content: |
+          ==================================================
+          HOST: {{ inventory_hostname }}
+          DATE: {{ current_datetime }}
+          ==================================================
+          {{ journal_output.stdout }}
+
+
+      delegate_to: localhost
+      loop: "{{ ansible_play_batch }}"
+      loop_control:
+        label: "{{ inventory_hostname }}"
+      become: false

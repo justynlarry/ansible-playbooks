@@ -1,8 +1,11 @@
+[all:vars]
+ansible_user=ansbl-user
+
 [web-servers]
-192.168.0.132 ansible_user=dred-user
+192.168.0.132 
 
 [file-servers]
-192.168.0.107 ansible_user=ubred-user
+192.168.0.107 
 
 [system-monitors]
-192.168.0.108 ansible_user=ubred2-user
+192.168.0.108 
