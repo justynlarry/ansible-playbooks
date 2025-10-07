@@ -1,0 +1,42 @@
+---
+
+- name: Bootstrap ansible management user
+  hosts: all
+  become: true
+  gather_facts: true
+
+  vars_prompt:
+    - name: ansible_ssh_pass
+      prompt:  "Enter the SSH password: "
+      private: yes
+
+  pre_tasks:
+  - name: install updates (Ubuntu/Debian)
+    tags: always
+    apt:
+      upgrade: yes
+      update_cache: yes
+    when: ansible_distribution in ["Debian", "Ubuntu"]
+
+
+  tasks:
+  - name: create ansible user (ansbl-user)
+    tags: always
+    user:
+      name: ansbl-user
+      groups: root
+
+  - name: add ssh key for ansbl-user
+    tags: always
+    authorized_key:
+      user: ansbl-user
+      key: "{{ lookup('file', 'files/ansible_management_user.pub') }}"
+
+  - name:  add sudoers file for ansbl-user
+    tags: always
+    copy:
+      src: sudoer_ansbl-user
+      dest: /etc/sudoers.d/ansbl-user
+      owner: root
+      group:  root
+      mode: 0440
