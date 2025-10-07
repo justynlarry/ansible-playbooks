@@ -2,10 +2,43 @@
 ansible_user=ansbl-user
 
 [web-servers]
+# debRed
 192.168.0.132 
+# mtg-webserver
+#192.168.0.120
+# heimdall
+#192.168.0.137
 
 [file-servers]
-192.168.0.107 
+# ubRed
+192.168.0.107
+# shire
+# 192.168.0.195
+# file-server
+# 192.168.0.121
+
+
 
 [system-monitors]
+# ubRed2
 192.168.0.108 
+# sys-monitor
+# 192.168.0.11
+# mandalore
+#192.168.0.168
+
+[proxmox-servers]
+# pveBlack
+#192.168.0.217
+# pveGreen
+#192.168.0.221
+# pveRed
+#192.168.0.218
+# pbsBlack
+# 192.168.0.219
+# pbsGreen
+#192.168.0.222
+# debGold
+#10.0.10.50
+# debBlue
+#10.0.10.70
