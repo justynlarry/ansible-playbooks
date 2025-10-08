@@ -7,7 +7,7 @@
 
   vars_prompt:
     - name: ansible_ssh_pass
-      prompt:  "Enter the SSH password: "
+      prompt:  "Enter the SSH password for remote machine: "
       private: yes
 
   pre_tasks:
@@ -24,7 +24,6 @@
     tags: always
     user:
       name: ansbl-user
-      groups: root
 
   - name: add ssh key for ansbl-user
     tags: always
