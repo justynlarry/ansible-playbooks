@@ -1,5 +1,5 @@
 files/ansible_management_user.pub
-host_vars/*
+host_vars/
 
 *.swp
 
