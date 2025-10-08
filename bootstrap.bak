@@ -5,8 +5,10 @@
   become: true
   gather_facts: true
 
-  vars:
-    ansible_ssh_pass: "{{ vault_ansible_ssh_pass }}"
+  vars_prompt:
+    - name: ansible_ssh_pass
+      prompt:  "Enter the SSH password for remote machine: "
+      private: yes
 
   pre_tasks:
   - name: install updates (Ubuntu/Debian)
