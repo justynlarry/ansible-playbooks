@@ -1,7 +1,7 @@
 ---
 
 - name: Bootstrap Docker Management User
-  hosts: docker-svr
+  hosts: db-servers
   become: true
   gather_facts: true
 
@@ -31,8 +31,8 @@
 
   - name:  Add docker-user to docker group
     tags: always
-    copy:
-      src: docker_docker_user
-      group: docker
-      owner: docker
+    user:
+      name: docker-user
+      groups: docker
       append: yes
+
