@@ -1,0 +1,77 @@
+# docker_full_setup.yml
+---
+
+- name: Install Docker and bootstrap Docker management user
+  hosts: db-servers
+  become: true
+  gather_facts: true
+
+  vars:
+    docker_user: docker-user
+    ansible_ssh_pass: "{{ vault_ansible_ssh_pass }}"
+
+  tasks:
+
+    - name: Install prerequisite packages
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      loop:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - gnupg2
+
+    - name: Create keyrings directory if not exists
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Add Docker GPG key (modern method)
+      get_url:
+        url: https://download.docker.com/linux/debian/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: '0644'
+
+    - name: Add Docker APT repository (modern method)
+      apt_repository:
+        repo: "deb [arch={{ 'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian bookworm stable"
+        state: present
+        filename: docker
+
+    - name:  Force APT cache update after adding Docker repo
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install Docker packages
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+        update_cache: yes
+
+    - name: Ensure Docker service is running
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Create Docker management user
+      user:
+        name: "{{ docker_user }}"
+        shell: /bin/bash
+        groups: docker
+        append: yes
+        state: present
+
+    - name: Add SSH key for Docker user
+      ansible.posix.authorized_key:
+        user: "{{ docker_user }}"
+        key: "{{ lookup('file', 'files/docker_user_key.pub') }}"
