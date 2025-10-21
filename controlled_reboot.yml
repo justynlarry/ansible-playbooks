@@ -2,6 +2,7 @@
 
 - name: System-Wide Controlled Reboot
   hosts:  all
+  become: true
   serial: 1
   tasks:
     - name: Reboot VMs Gracefully
