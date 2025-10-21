@@ -1,5 +1,13 @@
 ---
 
+## Requires User to input:
+##  - mysql_root_pass
+##  - db_user
+##  - db_pass
+##  - db_name
+## In vault under IP Address-> vault.yml in addition to user/userpw for system
+
+
 - name: setup Mysql
   become: yes
   hosts: db-servers
@@ -9,7 +17,7 @@
       - mysql-server
       - mysql-client
       - python3-mysqldb
-      - libmysqlcient-dev
+      - libmysqlclient-dev
 
   tasks:
     - name: Installing Mysql  and dependencies
@@ -26,10 +34,10 @@
         enabled: yes
 
     - name: Set MySQL root password and secure the installation
-      community.ysql.mysql_user:
+      community.mysql.mysql_user:
         name: root
         host: "{{ item }}"
-        password: "{{ mysql_root_pass }}
+        password: "{{ mysql_root_pass }}"
         login_user: root
         login_unix_socket:  /var/run/mysqld/mysqld.sock
       loop:
@@ -37,17 +45,23 @@
         - ::1
         - localhost
 
-    - name: creating mysql user
+    - name: Creating MySQL User
       mysql_user:
         name: "{{db_user}}"
         password: "{{db_pass}}"
         priv: '*.*:ALL'
         host: '%'
         state: present
-    - name: creating mysql_db
+        login_user: root
+        login_password: "{{ mysql_root_pass }}"
+
+    - name: Creating mysql_db
       mysql_db:
         name: "{{db_name}}"
         state: present
+        login_user: root
+        login_password: "{{ mysql_root_pass }}"
+
     - name: Enable remote login to mysql
       lineinfile:
          path: /etc/mysql/mysql.conf.d/mysqld.cnf
