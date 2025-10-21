@@ -1,0 +1,9 @@
+---
+
+- name: System-Wide Controlled Reboot
+  hosts:  all
+  serial: 1
+  tasks:
+    - name: Reboot VMs Gracefully
+      ansible.builtin.reboot:
+        reboot_timeout: 900
