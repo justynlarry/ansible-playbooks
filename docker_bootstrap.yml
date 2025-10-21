@@ -1,0 +1,38 @@
+---
+
+- name: Bootstrap Docker Management User
+  hosts: docker-svr
+  become: true
+  gather_facts: true
+
+  vars:
+    ansible_ssh_pass: "{{ vault_ansible_ssh_pass }}"
+
+  pre_tasks:
+  - name: Install Updates (Ubuntu/Debian)
+    tags: always
+    apt:
+      upgrade: yes
+      update_cache: yes
+    when: ansible_distribution in ["Debian", "Ubuntu"]
+
+
+  tasks:
+  - name: Create Docker User (docker-user)
+    tags: always
+    user:
+      name: docker-user
+
+  - name: Add Dedicated SSH Key for docker-user
+    tags: always
+    ansible.posix.authorized_key:
+      user: docker-user
+      key: "{{ lookup('file', 'files/docker_user_key.pub') }}"
+
+  - name:  Add docker-user to docker group
+    tags: always
+    copy:
+      src: docker_docker_user
+      group: docker
+      owner: docker
+      append: yes
