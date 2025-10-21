@@ -1,0 +1,63 @@
+---
+
+- name: setup Mysql
+  become: yes
+  hosts: db-servers
+
+  vars:
+    mysql_packages:
+      - mysql-server
+      - mysql-client
+      - python3-mysqldb
+      - libmysqlcient-dev
+
+  tasks:
+    - name: Installing Mysql  and dependencies
+      ansible.builtin.package:
+       name: "{{item}}"
+       state: present
+       update_cache: yes
+     loop: "{{ mysql_packages }}"
+
+    - name: start and enable mysql service
+      service:
+        name: mysql
+        state: started
+        enabled: yes
+
+    - name: Set MySQL root password and secure the installation
+      community.ysql.mysql_user:
+        name: root
+        host: "{{ item }}"
+        password: "{{ mysql_root_pass }}
+        login_user: root
+        login_unix_socket:  /var/run/mysqld/mysqld.sock
+      loop:
+        - 127.0.0.1
+        - ::1
+        - localhost
+
+    - name: creating mysql user
+      mysql_user:
+        name: "{{db_user}}"
+        password: "{{db_pass}}"
+        priv: '*.*:ALL'
+        host: '%'
+        state: present
+    - name: creating mysql_db
+      mysql_db:
+        name: "{{db_name}}"
+        state: present
+    - name: Enable remote login to mysql
+      lineinfile:
+         path: /etc/mysql/mysql.conf.d/mysqld.cnf
+         regexp: '^bind-address'
+         line: 'bind-address = 0.0.0.0'
+         backup: yes
+      notify:
+         - Restart mysql
+  handlers:
+    - name: Restart mysql
+      service:
+        name: mysql
+        state: restarted
