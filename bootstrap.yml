@@ -18,11 +18,16 @@
 
   pre_tasks:
 
-  - name: Install Sudo
+  - name: Install Sudo, Python, Curl, htop, git, wget, net-tools
     ansible.builtin.apt:
       name:
         - sudo
         - python3
+        - curl
+        - htop
+        - wget
+        - git
+        - net-tools
       state: present
 
   - name: Gather facts after installing sudo
