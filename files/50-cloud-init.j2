@@ -1,0 +1,14 @@
+network:
+  version: 2
+  ethernets:
+    {{ ansible_default_ipv4.interface }}
+      dhcp4: no
+      addresses:
+        - {{ ansible_default_ipv4.address }}/{{ ansible_default_ipv4.netmask | ipaddr('prefix') }}
+      routes:
+        - to: default
+          via: {{ansible_default_ipv4.gateway }}
+      nameservers:
+        addresses:
+          - 1.1.1.1
+          - 8.8.8.8
