@@ -3,12 +3,31 @@
 - name: Bootstrap ansible management user
   hosts: all
   become: true
-  gather_facts: true
+  become_user: root
+  become_method: su
+  gather_facts: false
 
   vars:
     ansible_ssh_pass: "{{ vault_ansible_ssh_pass }}"
+    ansible_become_pass: "{{ vault_ansible_ssh_pass }}"
+
+  handlers:
+    - name: reboot server
+      ansible.builtin.reboot:
+        reboot_timeout: 300
 
   pre_tasks:
+
+  - name: Install Sudo
+    ansible.builtin.apt:
+      name:
+        - sudo
+        - python3
+      state: present
+
+  - name: Gather facts after installing sudo
+    ansible.builtin.setup:
+
   - name: install updates (Ubuntu/Debian)
     tags: always
     apt:
@@ -16,8 +35,8 @@
       update_cache: yes
     when: ansible_distribution in ["Debian", "Ubuntu"]
 
-
   tasks:
+
   - name: create ansible user (ansbl-user)
     tags: always
     user:
@@ -37,3 +56,19 @@
       owner: root
       group:  root
       mode: 0440
+
+  - name: Configure current DHCP address as a static IP -> Debian
+    ansible.builtin.template:
+      src: files/interfaces.j2
+      dest: /etc/network/interfaces
+      owner: root
+      group: root
+      mode: '0644'
+
+  - name: Add primary user to the Sudo Group
+    ansible.builtin.user:
+      name: "{{ ansible_user }}"
+      groups: sudo
+      append: yes
+    become: true
+    notify: reboot server

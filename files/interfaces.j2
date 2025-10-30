@@ -1,0 +1,11 @@
+auto lo
+iface lo inet loopback
+
+#  Primary network interface, configured with current DHCP-assigned values
+
+auto {{ ansible_default_ipv4.interface }}
+iface {{ ansible_default_ipv4.interface }} inet static
+    address {{ ansible_default_ipv4.address }}
+    netmask {{ ansible_default_ipv4.netmask }}
+    gateway {{ ansible_default_ipv4.gateway }}
+    dns-nameservers 1.1.1.1 8.8.8.8
