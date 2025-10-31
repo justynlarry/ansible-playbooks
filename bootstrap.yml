@@ -16,16 +16,17 @@
       ansible.builtin.reboot:
         reboot_timeout: 300
 
-    - name: Apply netplan and wait for connection
+    - name: Apply netplan configuration
+      ansible.builtin.command: netplan apply
       when: ansible_distribution == "Ubuntu"
-      block:
-        - name: Apply netplan configuration
-          ansible.builtin.command: netplan apply
 
-        - name: Wait for connection to be restored (after IP change)
-          ansible.builtin.wait_for_connection:
-            timeout: 30
-            delay: 5
+    - name: Wait for connection to be restored (after IP change)
+      ansible.builtin.wait_for_connection:
+        timeout: 30
+        delay: 5
+
+  collections:
+    - ansible.utils
 
   pre_tasks:
 
@@ -80,6 +81,7 @@
       owner: root
       group: root
       mode: '0644'
+    when: ansible_distribution == "Debian"
 
   - name: Configure current DHCP address as static IP -> Ubuntu
     ansible.builtin.template:
@@ -88,7 +90,10 @@
       owner: root
       group: root
       mode: '0644'
-    notify: Apply netplan and wait for connection
+    when: ansible_distribution == "Ubuntu"
+    notify:
+      - Apply netplan configuration
+      - Wait for Connection to be restored (after IP change)
 
   - name: Add primary user to the Sudo Group
     ansible.builtin.user:
