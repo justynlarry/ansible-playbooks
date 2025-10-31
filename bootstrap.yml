@@ -92,10 +92,18 @@
       mode: "0644"
     when: ansible_distribution == "Ubuntu"
 
-  - name: Disable 90-installer-netowrk.cfg
-    ansible.builtin.command: 
-      cmd:  mv /etc/cloud/cloud.cfg.d/90-installer-network.cfg /etc/cloud/cloud.cfg.d/90-installer-network.bak
+  - name: Check if 90-installer-network.cfg exists
+    ansible.builtin.stat:
+      path: /etc/cloud/cloud.cfg.d/90-installer-network.cfg
+    register: installer_network_cfg
     when: ansible_distribution == "Ubuntu"
+
+  - name: Disable 90-installer-netowrk.cfg
+    ansible.builtin.command:
+      cmd:  mv /etc/cloud/cloud.cfg.d/90-installer-network.cfg /etc/cloud/cloud.cfg.d/90-installer-network.bak
+    when:
+      - ansible_distribution == "Ubuntu"
+      - installer_network_cfg.stat.exists
 
   - name: Configure current DHCP address as static IP -> Ubuntu
     ansible.builtin.template:
@@ -107,7 +115,7 @@
     when: ansible_distribution == "Ubuntu"
     notify:
       - Apply netplan configuration
-      - Wait for connection to be restored (after IP change)
+      - reboot server
 
   - name: Add primary user to the Sudo Group
     ansible.builtin.user:
