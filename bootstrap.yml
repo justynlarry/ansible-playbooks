@@ -83,17 +83,31 @@
       mode: '0644'
     when: ansible_distribution == "Debian"
 
+  - name: Disable cloud-init network management (Ubuntu)
+    ansible.builtin.copy:
+      dest: /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
+      content: "network: {config: disabled}\n"
+      owner: root
+      group: root
+      mode: "0644"
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Disable 90-installer-netowrk.cfg
+    ansible.builtin.command: 
+      cmd:  mv /etc/cloud/cloud.cfg.d/90-installer-network.cfg /etc/cloud/cloud.cfg.d/90-installer-network.bak
+    when: ansible_distribution == "Ubuntu"
+
   - name: Configure current DHCP address as static IP -> Ubuntu
     ansible.builtin.template:
       src: files/50-cloud-init.j2
       dest: /etc/netplan/50-cloud-init.yaml
       owner: root
       group: root
-      mode: '0644'
+      mode: '0600'
     when: ansible_distribution == "Ubuntu"
     notify:
       - Apply netplan configuration
-      - Wait for Connection to be restored (after IP change)
+      - Wait for connection to be restored (after IP change)
 
   - name: Add primary user to the Sudo Group
     ansible.builtin.user:
