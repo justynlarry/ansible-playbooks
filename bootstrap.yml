@@ -1,7 +1,7 @@
 ---
 
 - name: Bootstrap ansible management user
-  hosts: all
+  hosts: dev-servers
   become: true
   become_user: root
   become_method: su
