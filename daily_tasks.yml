@@ -46,3 +46,13 @@
       loop_control:
         label: "{{ inventory_hostname }}"
       become: false
+
+  - name: Check if system reboot is required
+    ansible.builtin.stat:
+      path: /var/run/reboot-required
+    register: reboot_required_file
+
+  - name: Notify if reboot required
+    ansible.builtin.debug:
+      msg: "REBOOT REQUIRED: The file /var/run/reboot-required exists."
+    when: reboot_required_file.stat.exists
