@@ -54,5 +54,5 @@
 
     - name: Notify if reboot required
       ansible.builtin.debug:
-        msg: "REBOOT REQUIRED: The file /var/run/reboot-required exists."
+        msg: "\u001b[1;31m REBOOT REQUIRED: The file /var/run/reboot-required exists.\u001b[0m"
       when: reboot_required_file.stat.exists
