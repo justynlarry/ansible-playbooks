@@ -1,0 +1,14 @@
+---
+
+- name: reboot server
+  ansible.builtin.reboot:
+    reboot_timeout: 300
+
+- name: Apply netplan configuration
+  ansible.builtin.command:
+    cmd: netplan apply
+
+- name: Wait for connection to be restored
+  ansible.builtin.wait_for_connection:
+    timeout: 30
+    delay: 5

@@ -19,7 +19,7 @@
   register: installer_network_cfg
 
 
-- name: Disable 90-installer-netowrk.cfg
+- name: Disable 90-installer-network.cfg
   ansible.builtin.command:
     cmd:  mv /etc/cloud/cloud.cfg.d/90-installer-network.cfg /etc/cloud/cloud.cfg.d/90-installer-network.bak
   when:
@@ -32,6 +32,7 @@
     owner: root
     group: root
     mode: '0600'
+  notify:
+    - Apply netplan configuration
+    - reboot server
 
-- name: Apply netplan
-  command: netplan apply

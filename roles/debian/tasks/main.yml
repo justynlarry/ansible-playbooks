@@ -14,9 +14,9 @@
     mode: '0644'
 
 - name: Add primary user to the Sudo Group
-    ansible.builtin.user:
-      name: "{{ ansible_user }}"
-      groups: sudo
-      append: yes
-    become: true
-    notify: reboot server
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    groups: sudo
+    append: yes
+  become: true
+  notify: reboot server

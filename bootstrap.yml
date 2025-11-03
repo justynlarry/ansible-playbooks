@@ -5,7 +5,7 @@
   become: true
   gather_facts: true
 
-  var_files:
+  vars_files:
     - "host_vars/{{ inventory_hostname }}/vault.yml
 
   vars:

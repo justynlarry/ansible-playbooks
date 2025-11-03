@@ -1,16 +1,16 @@
 ---
 
 - name: Ensure basic packages are installed
-    ansible.builtin.apt:
-      name:
-        - sudo
-        - python3
-        - curl
-        - htop
-        - wget
-        - git
-        - net-tools
-      state: present
+  ansible.builtin.package:
+    name:
+      - sudo
+      - python3
+      - curl
+      - htop
+      - wget
+      - git
+      - net-tools
+    state: present
 
 - name: create ansible user (ansbl-user)
   user:

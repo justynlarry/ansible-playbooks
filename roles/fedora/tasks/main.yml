@@ -16,8 +16,14 @@
       - net-tools
     state: present
 
+- name: Restart Netowrk Service
+  ansible.builtin.service:
+    name: NetworkManager
+    state: restarted
+
 - name: Configure static IP
   template:
     src: files/ifcfg-eth0.j2
     dest: /etc/sysconfig/network-scripts/ifcfg-eth0
     mode: '0644'
+  notify: reboot server
