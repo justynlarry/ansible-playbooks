@@ -16,14 +16,33 @@
       - net-tools
     state: present
 
-- name: Restart Netowrk Service
-  ansible.builtin.service:
-    name: NetworkManager
-    state: restarted
+- name: Gather network facts
+  ansible.builtin.setup:
+    gather_subset:
+      - network
+  register: net_facts
 
-- name: Configure static IP
-  template:
+- name: Set variables for DHCP-assigned IP and subnet
+  set_fact:
+    dhcp_ip: "{{ ansible_default_ipv4.address }}"
+    dhcp_prefix: "{{ ansible_default_ipv4.network_prefix }}"
+    dhcp_gateway: "{{ ansible_default_ipv4.gateway }}"
+    dhcp_prefix: "{{ dhcp_netmask | ipaddr('prefix') }}"
+
+- name: Create nmconnection template for static IP
+  ansible.builtin.template:
     src: files/ifcfg-eth0.j2
-    dest: /etc/sysconfig/network-scripts/ifcfg-eth0
-    mode: '0644'
-  notify: reboot server
+    dest: "/etc/NetworkManager/system-connections/eth0.nmconnection"
+    owner: root
+    group: root
+    mode: '0600'
+  vars:
+    ip_address: "{{ dhcp_ip }}"
+    subnet_prefix: "{{ dhcp_prefix }}"
+    gateway: "{{ dhcp_gateway }}"
+  notify:
+    - Restart NetworkManager
+
+- name: Reboot Server
+  ansible.builtin.reboot:
+    reboot_timeout: 300

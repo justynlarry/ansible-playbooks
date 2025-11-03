@@ -3,15 +3,17 @@
 - name: Bootstrap ansible management User
   hosts: test
   become: true
+  become_user: root
+  become_method: su
   gather_facts: true
-
-  vars_files:
-    - "host_vars/{{ inventory_hostname }}/vault.yml
 
   vars:
     ansible_ssh_pass: "{{ vault_ansible_ssh_pass }}"
     ansible_become_pass: "{{ vault_ansible_ssh_pass }}"
 
   roles:
-    - role: common
-    - role: {{ ansible_distribution | lower }}"
+    - common
+  tasks:
+    - name: Include OS-Specific Role
+      ansible.builtin.include_role:
+        name: "{{ ansible_distribution | lower }}"

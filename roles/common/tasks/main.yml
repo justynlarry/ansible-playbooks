@@ -12,10 +12,14 @@
       - net-tools
     state: present
 
+- name: Set admin group name based on distro
+  set_fact:
+    admin_group: "{{ 'wheel' if ansible_distribution in ['Fedora', 'RedHat', 'CentOS'] else 'sudo' }}"
+
 - name: create ansible user (ansbl-user)
   user:
     name: ansbl-user
-    groups: sudo
+    groups: "{{ admin_group }}"
     append: yes
 
 - name: Add ssh key for ansbl-user
@@ -24,9 +28,10 @@
     key: "{{ lookup('file', 'files/ansible_management_user.pub') }}"
 
 - name:  Add sudoers file for ansbl-user
-  copy:
-    src: sudoer_ansbl-user
+  ansible.builtin.template:
+    src: sudoer_ansbl-user.j2
     dest: /etc/sudoers.d/ansbl-user
     owner: root
     group:  root
     mode: 0440
+    validate: 'visudo -cf %s'
