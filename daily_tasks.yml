@@ -13,6 +13,12 @@
       update_cache: yes
     when: ansible_distribution in ["Debian", "Ubuntu"]
 
+  - name: Install updates (Fedora/RHEL)
+    dnf:
+      name: "*"
+      state: latest
+    when: ansible_distribution == "Fedora"
+
   tasks:
     - name: run journalctl command and store output
       ansible.builtin.command: journalctl -p 3 -xb
