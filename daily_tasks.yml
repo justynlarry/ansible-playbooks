@@ -1,7 +1,7 @@
 ---
 
 - name: Daily Server Maintenance and Checks
-  hosts: all
+  hosts: test
   become: true
   gather_facts: true
 

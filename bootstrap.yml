@@ -1,7 +1,7 @@
 ---
 
 - name: Bootstrap ansible management User
-  hosts: all
+  hosts: test
   become: true
   gather_facts: true
 
