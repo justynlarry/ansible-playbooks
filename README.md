@@ -65,6 +65,8 @@ This playbook sets up the Ansible management user (ansbl-user) on all hosts:
 - Creates ansbl-user
 - Adds SSH public key for secure access
 - Adds sudoers file for passwordless sudo
+- Sets Static IP Address for Ubuntu & Debian
+- Installs sudo, python3, curl, htop, wget, git, net-tools
 
 Run example:
 
@@ -77,6 +79,8 @@ Automates daily server maintenance:
 - Installs system updates
 - Collects logs via journalctl -p 3 -xb for errors
 - Stores problematic logs on the Ansible control node for review
+- Checks for /var/run/reboot-required file to see if reboot is necessary."
+
 
 Run example:
 ```bash
