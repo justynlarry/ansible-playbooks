@@ -1,6 +1,7 @@
 ---
 
 - name: Ensure basic packages are installed
+  become: true
   ansible.builtin.package:
     name:
       - sudo
@@ -28,10 +29,11 @@
     key: "{{ lookup('file', 'files/ansible_management_user.pub') }}"
 
 - name:  Add sudoers file for ansbl-user
-  ansible.builtin.template:
-    src: sudoer_ansbl-user.j2
+  become: true
+  ansible.builtin.copy:
     dest: /etc/sudoers.d/ansbl-user
+    content: "ansbl-user ALL=(ALL) NOPASSWD: ALL\n"
     owner: root
     group:  root
     mode: 0440
-    validate: 'visudo -cf %s'
+    validate: '/usr/sbin/visudo -cf %s'

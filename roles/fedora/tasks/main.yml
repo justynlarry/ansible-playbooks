@@ -1,19 +1,19 @@
 ---
 - name: Update packages
-  dnf:
+  become: true
+  ansible.builtin.dnf:
     name: "*"
     state: latest
+    update_cache: yes
 
 - name: Ensure required packages are installed
-  dnf:
+  become: true
+  ansible.builtin.package:
     name:
-      - sudo
-      - python3
-      - curl
-      - htop
-      - git
-      - wget
+      - NetworkManager
+      - iproute
       - net-tools
+      - python3-netaddr
     state: present
 
 - name: Gather network facts
@@ -23,26 +23,28 @@
   register: net_facts
 
 - name: Set variables for DHCP-assigned IP and subnet
-  set_fact:
+  ansible.builtin.set_fact:
     dhcp_ip: "{{ ansible_default_ipv4.address }}"
-    dhcp_prefix: "{{ ansible_default_ipv4.network_prefix }}"
+    dhcp_prefix: "{{ ansible_default_ipv4.netmask | ansible.utils.ipaddr('prefix') }}"
     dhcp_gateway: "{{ ansible_default_ipv4.gateway }}"
-    dhcp_prefix: "{{ dhcp_netmask | ipaddr('prefix') }}"
 
-- name: Create nmconnection template for static IP
-  ansible.builtin.template:
-    src: files/ifcfg-eth0.j2
-    dest: "/etc/NetworkManager/system-connections/eth0.nmconnection"
-    owner: root
-    group: root
-    mode: '0600'
-  vars:
-    ip_address: "{{ dhcp_ip }}"
-    subnet_prefix: "{{ dhcp_prefix }}"
-    gateway: "{{ dhcp_gateway }}"
-  notify:
+- name: Debug network vars (optional)
+  ansible.builtin.debug:
+    msg:
+      - "DHCP IP: {{ dhcp_ip }}"
+      - "Prefix: {{ dhcp_prefix }}"
+      - "Gateway: {{ dhcp_gateway }}"
+
+- name: Configure static IP using current DHCP info (via nmcli)
+  community.general.nmcli:
+    conn_name: "{{ ansible_default_ipv4.interface }}"
+    ifname: "{{ ansible_default_ipv4.interface }}"
+    state: present
+    type: ethernet
+    ip4: "{{ dhcp_ip }}/{{ dhcp_prefix }}"
+    gw4: "{{ dhcp_gateway }}"
+    dns4: ["8.8.8.8", "1.1.1.1"]
+    method4: manual
+  notify: 
     - Restart NetworkManager
-
-- name: Reboot Server
-  ansible.builtin.reboot:
-    reboot_timeout: 300
+    - reboot server

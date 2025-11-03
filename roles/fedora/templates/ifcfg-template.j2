@@ -1,0 +1,9 @@
+DEVICE={{ ansible_default_ipv4.interface }}
+BOOTPROTO=none
+ONBOOT=yes
+IPADDR={{ dhcp_ip }}
+PREFIX={{ dhcp_prefix }}
+GATEWAY={{ dhcp_gateway }}
+DNS1=8.8.8.8
+DNS2=1.1.1.1
+NM_CONTROLLED=yes

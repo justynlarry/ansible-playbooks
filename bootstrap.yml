@@ -7,6 +7,11 @@
   become_method: su
   gather_facts: true
 
+  collections:
+    - ansible.netcommon
+    - ansible.utils
+    - community.general
+
   vars:
     ansible_ssh_pass: "{{ vault_ansible_ssh_pass }}"
     ansible_become_pass: "{{ vault_ansible_ssh_pass }}"
