@@ -11,6 +11,9 @@ This repository contains Ansible playbooks and configuration files used to manag
 ├── bootstrap.yml # Playbook to bootstrap ansible management user
 ├── daily_tasks.yml # Playbook for daily maintenance and log collection
 ├── site.yml # (Optional) Main playbook to include all tasks
+├── controlled_reboot.yml # Playbook for Rolling System-wide Reboot
+├── db_setup.yml # Install MySQL Server on Debian
+├── docker_debian_setup.yml # Install Docker on Debian
 ├── update_upgrade.yml # Playbook for updates and upgrades
 ├── inventories # Inventory files for hosts
 │ ├── bootstrap.ini # Inventory for bootstrapping new hosts
