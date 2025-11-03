@@ -53,6 +53,11 @@ private_key_file = ~/.ssh/ansible
 - bootstrap.ini – Inventory for initial bootstrapping of servers, with per-host users defined.
 - production.ini – Inventory for ongoing management, using the centralized ansbl-user.
 
+# Files
+- 50-cloud-init.j2 - Netplan configuration file for Ubuntu Server to switch from DHCP to static IP Address.
+- interfaces.js - Interfaces configuration file for Debian Server to switch from DHCP to Static IP Address
+
+
 # Playbooks
 1. Bootstrap Ansible User (bootstrap.yml)
 This playbook sets up the Ansible management user (ansbl-user) on all hosts:
