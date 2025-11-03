@@ -1,36 +1,6 @@
 ---
 
-- name: Bootstrap ansible management user
-  hosts: dev-servers
-  become: true
-  become_user: root
-  become_method: su
-  gather_facts: false
-
-  vars:
-    ansible_ssh_pass: "{{ vault_ansible_ssh_pass }}"
-    ansible_become_pass: "{{ vault_ansible_ssh_pass }}"
-
-  handlers:
-    - name: reboot server
-      ansible.builtin.reboot:
-        reboot_timeout: 300
-
-    - name: Apply netplan configuration
-      ansible.builtin.command: netplan apply
-      when: ansible_distribution == "Ubuntu"
-
-    - name: Wait for connection to be restored (after IP change)
-      ansible.builtin.wait_for_connection:
-        timeout: 30
-        delay: 5
-
-  collections:
-    - ansible.utils
-
-  pre_tasks:
-
-  - name: Install Sudo, Python, Curl, htop, git, wget, net-tools
+- name: Ensure basic packages are installed
     ansible.builtin.apt:
       name:
         - sudo
@@ -42,85 +12,21 @@
         - net-tools
       state: present
 
-  - name: Gather facts after installing sudo
-    ansible.builtin.setup:
+- name: create ansible user (ansbl-user)
+  user:
+    name: ansbl-user
+    groups: sudo
+    append: yes
 
-  - name: install updates (Ubuntu/Debian)
-    tags: always
-    apt:
-      upgrade: yes
-      update_cache: yes
-    when: ansible_distribution in ["Debian", "Ubuntu"]
+- name: Add ssh key for ansbl-user
+  authorized_key:
+    user: ansbl-user
+    key: "{{ lookup('file', 'files/ansible_management_user.pub') }}"
 
-  tasks:
-
-  - name: create ansible user (ansbl-user)
-    tags: always
-    user:
-      name: ansbl-user
-
-  - name: add ssh key for ansbl-user
-    tags: always
-    authorized_key:
-      user: ansbl-user
-      key: "{{ lookup('file', 'files/ansible_management_user.pub') }}"
-
-  - name:  add sudoers file for ansbl-user
-    tags: always
-    copy:
-      src: sudoer_ansbl-user
-      dest: /etc/sudoers.d/ansbl-user
-      owner: root
-      group:  root
-      mode: 0440
-
-  - name: Configure current DHCP address as a static IP -> Debian
-    ansible.builtin.template:
-      src: files/interfaces.j2
-      dest: /etc/network/interfaces
-      owner: root
-      group: root
-      mode: '0644'
-    when: ansible_distribution == "Debian"
-
-  - name: Disable cloud-init network management (Ubuntu)
-    ansible.builtin.copy:
-      dest: /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
-      content: "network: {config: disabled}\n"
-      owner: root
-      group: root
-      mode: "0644"
-    when: ansible_distribution == "Ubuntu"
-
-  - name: Check if 90-installer-network.cfg exists
-    ansible.builtin.stat:
-      path: /etc/cloud/cloud.cfg.d/90-installer-network.cfg
-    register: installer_network_cfg
-    when: ansible_distribution == "Ubuntu"
-
-  - name: Disable 90-installer-netowrk.cfg
-    ansible.builtin.command:
-      cmd:  mv /etc/cloud/cloud.cfg.d/90-installer-network.cfg /etc/cloud/cloud.cfg.d/90-installer-network.bak
-    when:
-      - ansible_distribution == "Ubuntu"
-      - installer_network_cfg.stat.exists
-
-  - name: Configure current DHCP address as static IP -> Ubuntu
-    ansible.builtin.template:
-      src: files/50-cloud-init.j2
-      dest: /etc/netplan/50-cloud-init.yaml
-      owner: root
-      group: root
-      mode: '0600'
-    when: ansible_distribution == "Ubuntu"
-    notify:
-      - Apply netplan configuration
-      - reboot server
-
-  - name: Add primary user to the Sudo Group
-    ansible.builtin.user:
-      name: "{{ ansible_user }}"
-      groups: sudo
-      append: yes
-    become: true
-    notify: reboot server
+- name:  Add sudoers file for ansbl-user
+  copy:
+    src: sudoer_ansbl-user
+    dest: /etc/sudoers.d/ansbl-user
+    owner: root
+    group:  root
+    mode: 0440
