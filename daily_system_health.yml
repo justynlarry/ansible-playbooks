@@ -60,13 +60,13 @@
           Date: {{ ansible_date_time.date }} {{ ansible_date_time.time }}
 
           --- UPTIME / USERS ---
-          {{ uptime_info.stdout }}
+          {{ uptime_info.stdout | default('N/A') }}
 
           --- MEMORY USAGE ---
-          {{ mem_info.stdout }}
+          {{ mem_info.stdout | default('N/A') }}
 
           --- DISK USAGE ---
-          {{ disk_info.stdout }}
+          {{ disk_info.stdout | default('N/A') }}
 
           --- FAILED SERVICES ---
           {{ failed_services.stdout | default('None detected') }}
@@ -79,10 +79,11 @@
           {{ apt_updates.stdout | default('No pending updates') }}
           {% elif ansible_os_family == 'RedHat' %}
           {{ dnf_updates.stdout | default('No pending updates') }}
+          {% else %}
+          No update info available for {{ ansible_os_family }}
           {% endif %}
 
           --- RECENT FAILED SSH LOGINS ---
           {{ ssh_failed.stdout | default('None') }}
 
           =====================================
-
