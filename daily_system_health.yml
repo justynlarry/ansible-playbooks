@@ -1,0 +1,88 @@
+---
+
+- name: Daily System Health Report
+  hosts: all
+  become: yes
+  gather_facts: yes
+
+  vars:
+    report_dir: /var/log/sysadmin_reports
+    report_file: "{{ report_dir }}/daily_report{{ ansible_date_time.date }}.log"
+
+  tasks:
+    - name: Ensure report directory exists
+      ansible.builtin.file:
+        path: "{{ report_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    # --- System Health Checks ---
+
+    - name: Get Uptime, Load, Users
+      ansible.builtin.shell: uptime && who
+      register: uptime_info
+
+    - name: Get Memory Usage
+      ansible.builtin.command: free -h
+      register: mem_info
+
+    - name: Check for Failed Systemd Services
+      ansible.builtin.shell: systemctl --failed --no-pager || true
+      register: failed_services
+
+    # --- Log Checks ---
+
+    - name: Get High-Priority Logs (errors and criticals)
+      ansible.builtin.command: journalctl -p 3 -xb --no-pager
+      register: log_critical
+      changed_when: false
+
+    # --- Optional Security & SSH Review ---
+
+    - name: Check Recent Failed SSH Logins
+      ansible.builtin.shell: journalctl -u ssh -p 4 --since "24 hours ago" --no-pager || true
+      register: ssh_failed
+      changed_when: false
+
+    # --- Write to Log File ---
+
+    - name: Create Daily System Report
+      ansible.builtin.copy:
+        dest: "{{ report_file }}"
+        owner: root
+        group: root
+        mode: '0644'
+        content: |
+          ===== DAILY SYSTEM HEALTH REPORT =====
+          Host: {{ inventory_hostname }}
+          Date: {{ ansible_date_time.date }} {{ ansible_date_time.time }}
+
+          --- UPTIME / USERS ---
+          {{ uptime_info.stdout }}
+
+          --- MEMORY USAGE ---
+          {{ mem_info.stdout }}
+
+          --- DISK USAGE ---
+          {{ disk_info.stdout }}
+
+          --- FAILED SERVICES ---
+          {{ failed_services.stdout | default('None detected') }}
+
+          --- CRITICAL LOGS (journalctl -p 3) ---
+          {{ log_critical.stdout | default('No critical logs found') }}
+
+          --- PENDING UPDATES ---
+          {% if ansible_os_family == 'Debian' %}
+          {{ apt_updates.stdout | default('No pending updates') }}
+          {% elif ansible_os_family == 'RedHat' %}
+          {{ dnf_updates.stdout | default('No pending updates') }}
+          {% endif %}
+
+          --- RECENT FAILED SSH LOGINS ---
+          {{ ssh_failed.stdout | default('None') }}
+
+          =====================================
+
