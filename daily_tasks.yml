@@ -27,7 +27,7 @@
 
     - name: Display problematic logs for each host
       ansible.builtin.debug:
-        msg: "Host: {{ inventory_hostname }}\nLogs: \n{{ journal_output.stdout }}"
+        msg: "Host: {{ ansible_hostname }}\nIP Address:  \n{{ inventory_hostname }}\nLogs: \n{{ journal_output.stdout }}"
       when: journal_output.stdout | length > 0
 
     - name: Add date header to files
@@ -41,8 +41,9 @@
         dest:  "/tmp/problem_logs_report_{{ current_datetime }}_{{ inventory_hostname }}.tmp"
         content: |
           ==================================================
-          HOST: {{ inventory_hostname }}
-          DATE: {{ current_datetime }}
+          HOST:     {{ ansible_hostname }}
+          IP ADDR:  {{ inventory_hostname }}
+          DATE:     {{ current_datetime }}
           ==================================================
           {{ journal_output.stdout }}
 
