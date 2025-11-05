@@ -61,11 +61,19 @@
         group: root
         mode: '0644'
         content: |
-          ============== DAILY SYSTEM HEALTH REPORT ======================
+          {% set C_BLUE = '\033[34m' %}
+          {% set C_GREEN = '\033[32m' %}
+          {% set C_RED = '\033[31m' %}
+          {% set C_YELLOW = '\033[33m' %}
+          {% set C_PURPLE = '\033[35m' %}
+          {% set C_BOLD = '\033[1m' %}
+          {% set C_RESET = '\033[0m' %}
+
+          {{ C_BOLD }}{{ C_GREEN }}============== DAILY SYSTEM HEALTH REPORT ======================
           Host:        {{ ansible_hostname }}
           IP Address:  {{ inventory_hostname }}
           Date:        {{ ansible_date_time.date }} {{ ansible_date_time.time }}
-          ================================================================
+          ================================================================{{ C_RESET }}
 
           --- UPTIME / USERS ---
           {{ uptime_info.stdout | default('N/A') }}
