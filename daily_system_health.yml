@@ -66,6 +66,7 @@
           {% set C_RED = '\033[31m' %}
           {% set C_YELLOW = '\033[33m' %}
           {% set C_PURPLE = '\033[35m' %}
+          {% set C_CYAN = '\033[36m' %}
           {% set C_BOLD = '\033[1m' %}
           {% set C_RESET = '\033[0m' %}
 
@@ -75,22 +76,27 @@
           Date:        {{ ansible_date_time.date }} {{ ansible_date_time.time }}
           ================================================================{{ C_RESET }}
 
-          --- UPTIME / USERS ---
+          {{ C_BOLD }}{{ C_BLUE }}--- UPTIME / USERS ---{{ C_RESET }}
           {{ uptime_info.stdout | default('N/A') }}
 
-          --- MEMORY USAGE ---
+          {{ C_BOLD }}{{ C_BLUE }}--- MEMORY USAGE ---{{ C_RESET }}
           {{ mem_info.stdout | default('N/A') }}
 
-          --- DISK USAGE ---
+          {{ C_BOLD }}{{ C_BLUE }}--- DISK USAGE ---{{ C_RESET }}
           {{ disk_info.stdout | default('N/A') }}
 
-          --- FAILED SERVICES ---
+          {{ C_BOLD }}{{ C_RED }}--- FAILED SERVICES ---{{ C_RESET }}
           {{ failed_services.stdout | default('None detected') }}
 
-          --- CRITICAL LOGS (journalctl -p 3) ---
-          {{ log_critical.stdout | default('No critical logs found') }}
+          {% set log_content = log_critical.stdout | default('-- No entries --') | trim %}
+          {{ C_BOLD }}{{ C_RED }}--- CRITICAL LOGS (journalctl -p 3) ---{{ C_RESET }}
+          {% if log_content != '-- No entries --' %}
+          {{ C_CYAN }}{{ log_content }}{{ C_RESET }}
+          {% else %}
+          {{ C_RESET }}{{ log_content }}
+          {% endif %}
 
-          --- PENDING UPDATES ---
+          {{ C_BOLD }}{{ C_PURPLE }}--- PENDING UPDATES ---{{ C_RESET }}
           {% if ansible_os_family == 'Debian' %}
           {{ apt_updates.stdout | default('No pending updates') }}
           {% elif ansible_os_family == 'RedHat' %}
@@ -99,7 +105,7 @@
           No update info available for {{ ansible_os_family }}
           {% endif %}
 
-          --- RECENT FAILED SSH LOGINS ---
+          {{ C_BOLD }}{{ C_PURPLE }}--- RECENT FAILED SSH LOGINS ---{{ C_RESET }}
           {{ ssh_failed.stdout | default('None') }}
 
 
