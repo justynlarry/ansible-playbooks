@@ -1,11 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Log Files</title>
+<meta charset="UTF-8">
+<title>System Log Viewer</title>
+<style>
+pre { background: #f0f0f0; padding: 1rem; border: 1px solid #ccc; overflow-x: auto; }
+body { font-family: monospace; }
+</style>
 </head>
 <body>
-    
+<h1>System Log Viewer</h1>
+
+<label for="log-select">Select log:</label>
+<select id="log-select" onchange="loadLog(this.value)">
+    <option value="">--Select--</option>
+    <option value="daily_system_health_2025-11-05.log">daily_system_health_2025-11-05.log</option>
+    <!-- Add more options dynamically -->
+</select>
+
+<pre id="log-content"></pre>
+
+<script>
+function loadLog(file) {
+    if (!file) return;
+    fetch(`/daily_logs/${file}`)
+        .then(res => res.text())
+        .then(data => document.getElementById('log-content').textContent = data)
+        .catch(err => document.getElementById('log-content').textContent = 'Error loading log');
+}
+</script>
 </body>
 </html>
