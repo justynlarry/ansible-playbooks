@@ -1,7 +1,7 @@
 files/ansible_management_user.pub
 host_vars/
 reports/
-web_log/reports_web/
+web_log/html/daily_logs/
 
 *.swp
 
