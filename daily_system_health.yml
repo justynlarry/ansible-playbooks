@@ -165,4 +165,4 @@
     - name: Copy Combined Report to system_reports
       copy:
         src: "{{ combined_report_dir }}/daily_system_health_{{ local_date }}.log"
-        dest: "/opt/system_reports/daily_system_health_{{ local_date }}.log"
+        dest: "reports_web/daily_system_health_{{ local_date }}.log"

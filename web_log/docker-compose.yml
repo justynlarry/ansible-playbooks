@@ -5,6 +5,6 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ./reports_web:/var/www/html/daily_logs
+#      - ./html:/var/www/html/daily_logs
       - ./default.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./html:/usr/share/nginx/html:ro
+      - ./html:/var/www/html:ro
