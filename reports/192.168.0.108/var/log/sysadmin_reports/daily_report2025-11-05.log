@@ -1,19 +1,27 @@
-===== DAILY SYSTEM HEALTH REPORT =====
-Host: 192.168.0.108
-Date: 2025-11-05 01:06:26
+============== DAILY SYSTEM HEALTH REPORT ======================
+Host:        ubred2
+IP Address:  192.168.0.108
+Date:        2025-11-05 15:20:15
+================================================================
 
 --- UPTIME / USERS ---
- 01:06:31 up 5 days,  5:19,  1 user,  load average: 0.05, 0.06, 0.02
-ansbl-user pts/0        2025-11-05 01:06 (192.168.0.186)
-ansbl-user pts/1        2025-11-05 01:06 (192.168.0.186)
+ 15:20:20 up 5 days, 19:33,  1 user,  load average: 0.00, 0.03, 0.00
+ansbl-user pts/0        2025-11-05 15:20 (192.168.0.186)
+ansbl-user pts/1        2025-11-05 15:20 (192.168.0.186)
 
 --- MEMORY USAGE ---
                total        used        free      shared  buff/cache   available
-Mem:           961Mi       322Mi       250Mi       996Ki       541Mi       639Mi
-Swap:          2.0Gi        12Ki       2.0Gi
+Mem:           961Mi       332Mi       225Mi       988Ki       556Mi       628Mi
+Swap:          2.0Gi       268Ki       2.0Gi
 
 --- DISK USAGE ---
-N/A
+Filesystem                         Size  Used Avail Use% Mounted on
+tmpfs                               97M  988K   96M   2% /run
+/dev/mapper/ubuntu--vg-ubuntu--lv   30G  5.5G   23G  20% /
+tmpfs                              481M     0  481M   0% /dev/shm
+tmpfs                              5.0M     0  5.0M   0% /run/lock
+/dev/sda2                          2.0G  197M  1.6G  11% /boot
+tmpfs                               97M   12K   97M   1% /run/user/1001
 
 --- FAILED SERVICES ---
   UNIT LOAD ACTIVE SUB DESCRIPTION
@@ -28,5 +36,3 @@ No pending updates
 
 --- RECENT FAILED SSH LOGINS ---
 -- No entries --
-
-=====================================

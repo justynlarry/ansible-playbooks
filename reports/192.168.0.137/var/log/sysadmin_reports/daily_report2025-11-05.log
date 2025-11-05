@@ -1,19 +1,29 @@
-===== DAILY SYSTEM HEALTH REPORT =====
-Host: 192.168.0.137
-Date: 2025-11-05 01:06:24
+============== DAILY SYSTEM HEALTH REPORT ======================
+Host:        cloudcity-01
+IP Address:  192.168.0.137
+Date:        2025-11-05 15:20:13
+================================================================
 
 --- UPTIME / USERS ---
- 01:06:31 up 5 days,  5:22,  1 user,  load average: 0.01, 0.03, 0.00
-ansbl-user pts/0        2025-11-05 01:06 (192.168.0.186)
-ansbl-user pts/1        2025-11-05 01:06 (192.168.0.186)
+ 15:20:20 up 5 days, 19:35,  1 user,  load average: 0.15, 0.06, 0.01
+ansbl-user pts/0        2025-11-05 15:20 (192.168.0.186)
+ansbl-user pts/1        2025-11-05 15:20 (192.168.0.186)
 
 --- MEMORY USAGE ---
                total        used        free      shared  buff/cache   available
-Mem:           961Mi       405Mi        88Mi       504Ki       621Mi       555Mi
-Swap:          2.0Gi        94Mi       1.9Gi
+Mem:           961Mi       390Mi       104Mi       580Ki       622Mi       570Mi
+Swap:          2.0Gi        91Mi       1.9Gi
 
 --- DISK USAGE ---
-N/A
+Filesystem                         Size  Used Avail Use% Mounted on
+tmpfs                               97M  1.3M   95M   2% /run
+/dev/mapper/ubuntu--vg-ubuntu--lv   30G  8.0G   20G  29% /
+tmpfs                              481M     0  481M   0% /dev/shm
+tmpfs                              5.0M     0  5.0M   0% /run/lock
+/dev/sda2                          2.0G  197M  1.6G  11% /boot
+overlay                             30G  8.0G   20G  29% /var/lib/docker/overlay2/3cf9eece112c472d2a5860c865d455ab3340f782f27936ac8789884a2843ba39/merged
+overlay                             30G  8.0G   20G  29% /var/lib/docker/overlay2/36b4e0f76c2179a89c74cbcb01252e814c2b8a97b3b5f3845b9877cc4c6688ea/merged
+tmpfs                               97M   12K   97M   1% /run/user/1001
 
 --- FAILED SERVICES ---
   UNIT LOAD ACTIVE SUB DESCRIPTION
@@ -28,5 +38,3 @@ No pending updates
 
 --- RECENT FAILED SSH LOGINS ---
 -- No entries --
-
-=====================================

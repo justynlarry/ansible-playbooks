@@ -1,0 +1,42 @@
+============== DAILY SYSTEM HEALTH REPORT ======================
+Host:        shire
+IP Address:  192.168.0.195
+Date:        2025-11-05 08:20:13
+================================================================
+
+--- UPTIME / USERS ---
+ 08:20:20 up 5 days, 19:34,  1 user,  load average: 0.00, 0.03, 0.02
+ansbl-user pts/0        2025-11-05 08:20 (192.168.0.186)
+ansbl-user pts/1        2025-11-05 08:20 (192.168.0.186)
+
+--- MEMORY USAGE ---
+               total        used        free      shared  buff/cache   available
+Mem:           3.8Gi       967Mi       1.6Gi       3.6Mi       1.5Gi       2.9Gi
+Swap:             0B          0B          0B
+
+--- DISK USAGE ---
+Filesystem                         Size  Used Avail Use% Mounted on
+tmpfs                              392M  1.2M  391M   1% /run
+/dev/mapper/ubuntu--vg-ubuntu--lv   61G   14G   44G  24% /
+tmpfs                              2.0G     0  2.0G   0% /dev/shm
+tmpfs                              5.0M     0  5.0M   0% /run/lock
+/dev/sda2                          2.0G  197M  1.6G  11% /boot
+overlay                             61G   14G   44G  24% /var/lib/docker/overlay2/e2768225e09e23462f296d5f686c62dbcda4acb41b619c487476f0ae87db7f4d/merged
+tmpfs                              392M   12K  392M   1% /run/user/1001
+
+--- FAILED SERVICES ---
+  UNIT LOAD ACTIVE SUB DESCRIPTION
+
+0 loaded units listed.
+
+--- CRITICAL LOGS (journalctl -p 3) ---
+Oct 31 08:59:20 shire login[8771]: PAM unable to dlopen(pam_lastlog.so): /usr/lib/security/pam_lastlog.so: cannot open shared object file: No such file or directory
+Oct 31 08:59:20 shire login[8771]: PAM adding faulty module: pam_lastlog.so
+Oct 31 09:24:39 shire login[8996]: PAM unable to dlopen(pam_lastlog.so): /usr/lib/security/pam_lastlog.so: cannot open shared object file: No such file or directory
+Oct 31 09:24:39 shire login[8996]: PAM adding faulty module: pam_lastlog.so
+
+--- PENDING UPDATES ---
+No pending updates
+
+--- RECENT FAILED SSH LOGINS ---
+-- No entries --

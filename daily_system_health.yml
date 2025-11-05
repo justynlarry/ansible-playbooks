@@ -29,6 +29,11 @@
         cmd: free -h
       register: mem_info
 
+    - name: Get Disk Usage
+      ansible.builtin.command:
+        cmd: df -h
+      register: disk_info
+
     - name: Check for Failed Systemd Services
       ansible.builtin.shell: systemctl --failed --no-pager || true
       register: failed_services
@@ -56,9 +61,11 @@
         group: root
         mode: '0644'
         content: |
-          ===== DAILY SYSTEM HEALTH REPORT =====
-          Host: {{ inventory_hostname }}
-          Date: {{ ansible_date_time.date }} {{ ansible_date_time.time }}
+          ============== DAILY SYSTEM HEALTH REPORT ======================
+          Host:        {{ ansible_hostname }}
+          IP Address:  {{ inventory_hostname }}
+          Date:        {{ ansible_date_time.date }} {{ ansible_date_time.time }}
+          ================================================================
 
           --- UPTIME / USERS ---
           {{ uptime_info.stdout | default('N/A') }}
@@ -87,7 +94,6 @@
           --- RECENT FAILED SSH LOGINS ---
           {{ ssh_failed.stdout | default('None') }}
 
-          =====================================
 
     # --- Fetch Reports Back to Controller ---
 
