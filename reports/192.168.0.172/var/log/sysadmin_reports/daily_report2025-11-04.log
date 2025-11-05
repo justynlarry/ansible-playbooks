@@ -1,0 +1,31 @@
+===== DAILY SYSTEM HEALTH REPORT =====
+Host: 192.168.0.172
+Date: 2025-11-04 18:06:26
+
+--- UPTIME / USERS ---
+ 18:06:31 up 5 days,  5:17,  1 user,  load average: 0.01, 0.03, 0.00
+ansbl-user sshd         2025-11-04 18:06 (192.168.0.186)
+
+--- MEMORY USAGE ---
+               total        used        free      shared  buff/cache   available
+Mem:           1.9Gi       844Mi       511Mi       732Ki       765Mi       1.1Gi
+Swap:          1.6Gi          0B       1.6Gi
+
+--- DISK USAGE ---
+N/A
+
+--- FAILED SERVICES ---
+  UNIT LOAD ACTIVE SUB DESCRIPTION
+
+0 loaded units listed.
+
+--- CRITICAL LOGS (journalctl -p 3) ---
+-- No entries --
+
+--- PENDING UPDATES ---
+No pending updates
+
+--- RECENT FAILED SSH LOGINS ---
+-- No entries --
+
+=====================================

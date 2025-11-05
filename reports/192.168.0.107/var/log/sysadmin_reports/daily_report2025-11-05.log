@@ -1,0 +1,34 @@
+===== DAILY SYSTEM HEALTH REPORT =====
+Host: 192.168.0.107
+Date: 2025-11-05 01:06:24
+
+--- UPTIME / USERS ---
+ 01:06:31 up 5 days,  5:21,  1 user,  load average: 0.01, 0.03, 0.00
+ansbl-user pts/0        2025-11-05 01:06 (192.168.0.186)
+ansbl-user pts/1        2025-11-05 01:06 (192.168.0.186)
+
+--- MEMORY USAGE ---
+               total        used        free      shared  buff/cache   available
+Mem:           961Mi       342Mi       202Mi       3.9Mi       572Mi       619Mi
+Swap:          2.0Gi       780Ki       2.0Gi
+
+--- DISK USAGE ---
+N/A
+
+--- FAILED SERVICES ---
+  UNIT LOAD ACTIVE SUB DESCRIPTION
+
+0 loaded units listed.
+
+--- CRITICAL LOGS (journalctl -p 3) ---
+Oct 30 19:45:37 ubred sshd[924]: error: ioctl(TIOCSCTTY): Input/output error
+Oct 30 19:45:37 ubred sshd[924]: error: /dev/pts/0: No such file or directory
+Oct 30 19:45:37 ubred sshd[924]: error: open /dev/tty failed - could not set controlling tty: No such device or address
+
+--- PENDING UPDATES ---
+No pending updates
+
+--- RECENT FAILED SSH LOGINS ---
+-- No entries --
+
+=====================================

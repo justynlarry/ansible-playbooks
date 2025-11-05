@@ -1,0 +1,45 @@
+===== DAILY SYSTEM HEALTH REPORT =====
+Host: 192.168.0.132
+Date: 2025-11-04 18:06:23
+
+--- UPTIME / USERS ---
+ 18:06:31 up 5 days,  5:23,  2 users,  load average: 0.00, 0.02, 0.00
+ansbl-user sshd         2025-11-04 18:06 (192.168.0.186)
+dred-user seat0        2025-11-04 15:24
+dred-user tty1         2025-11-04 15:24
+
+--- MEMORY USAGE ---
+               total        used        free      shared  buff/cache   available
+Mem:           967Mi       351Mi       179Mi       632Ki       590Mi       615Mi
+Swap:          1.6Gi        12Ki       1.6Gi
+
+--- DISK USAGE ---
+N/A
+
+--- FAILED SERVICES ---
+  UNIT            LOAD   ACTIVE SUB    DESCRIPTION
+● apache2.service loaded failed failed The Apache HTTP Server
+
+Legend: LOAD   → Reflects whether the unit definition was properly loaded.
+        ACTIVE → The high-level unit activation state, i.e. generalization of SUB.
+        SUB    → The low-level unit activation state, values depend on unit type.
+
+1 loaded units listed.
+
+--- CRITICAL LOGS (journalctl -p 3) ---
+Oct 30 13:43:44 debRed systemd[1]: Failed to start apache2.service - The Apache HTTP Server.
+░░ Subject: A start job for unit apache2.service has failed
+░░ Defined-By: systemd
+░░ Support: https://www.debian.org/support
+░░ 
+░░ A start job for unit apache2.service has finished with a failure.
+░░ 
+░░ The job identifier is 114 and the job result is failed.
+
+--- PENDING UPDATES ---
+No pending updates
+
+--- RECENT FAILED SSH LOGINS ---
+-- No entries --
+
+=====================================

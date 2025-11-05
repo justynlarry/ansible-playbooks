@@ -25,7 +25,8 @@
       register: uptime_info
 
     - name: Get Memory Usage
-      ansible.builtin.command: free -h
+      ansible.builtin.command:
+        cmd: free -h
       register: mem_info
 
     - name: Check for Failed Systemd Services
@@ -87,3 +88,56 @@
           {{ ssh_failed.stdout | default('None') }}
 
           =====================================
+
+    # --- Fetch Reports Back to Controller ---
+
+    - name: Ensure Local Directory Exists
+      delegate_to: localhost
+      run_once: true
+      become: false
+      ansible.builtin.file:
+        path: "./reports"
+        state: directory
+        mode: '0755'
+
+    - name: Fetch Report From Each Host to Controller
+      ansible.builtin.fetch:
+        src: "{{ report_file }}"
+        dest: "./reports/"
+        flat: no
+
+    # --- Combine all Reports into one File (local only) ---
+
+- name: Combine all fetched reports into one master file
+  hosts: localhost
+  gather_facts: false
+  vars:
+    combined_report_dir: "./reports"
+    # Keep combined_report_file here, we will replace the lookup later
+    combined_report_file: "{{ combined_report_dir }}/daily_system_health_FIXME.log" # Placeholder
+
+  tasks:
+    # --- STEP 1: Define a consistent local date variable ---
+    - name: Set local date fact for file naming and lookup
+      ansible.builtin.set_fact:
+        local_date: "{{ lookup('pipe', 'date +%F') }}"
+
+    # --- STEP 2: Ensure Combined report directory exists (already done) ---
+    - name: Ensure Combined report directory exists
+      ansible.builtin.file:
+        path: "{{ combined_report_dir }}"
+        state: directory
+
+    # --- STEP 3: Merge all individual reports into one file ---
+    - name: Merge all individual reports into one file
+      ansible.builtin.shell: |
+        # Use the consistent local_date fact for file matching
+        cat {{ combined_report_dir }}/*/var/log/sysadmin_reports/daily_report{{ local_date }}.log > {{ combined_report_dir }}/daily_system_health_{{ local_date }}.log
+      args:
+        executable: /bin/bash
+      # Add this to prevent it from failing if no files are found (e.g., first run on a new day)
+      ignore_errors: yes
+
+    - name: Display Combined Report Summary Path
+      ansible.builtin.debug:
+        msg: "Combined Daily report saved at: {{ combined_report_dir }}/daily_system_health_{{ local_date }}.log"
