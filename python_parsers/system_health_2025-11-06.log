@@ -1,4 +1,5 @@
 --- Host: ubred
+--- Date: 2025-11-06
 Filesystem                         Size  Used Avail Use% Mounted on
 tmpfs                               97M  4.1M   93M   5% /run
 /dev/mapper/ubuntu--vg-ubuntu--lv   30G  5.6G   23G  20% /
@@ -7,6 +8,7 @@ tmpfs                              5.0M     0  5.0M   0% /run/lock
 /dev/sda2                          2.0G  197M  1.6G  11% /boot
 tmpfs                               97M   12K   97M   1% /run/user/1001
 --- Host: ubred2
+--- Date: 2025-11-06
 Filesystem                         Size  Used Avail Use% Mounted on
 tmpfs                               97M  988K   96M   2% /run
 /dev/mapper/ubuntu--vg-ubuntu--lv   30G  5.5G   23G  20% /
@@ -15,6 +17,7 @@ tmpfs                              5.0M     0  5.0M   0% /run/lock
 /dev/sda2                          2.0G  197M  1.6G  11% /boot
 tmpfs                               97M   12K   97M   1% /run/user/1001
 --- Host: sys-monitor
+--- Date: 2025-11-06
 Filesystem                         Size  Used Avail Use% Mounted on
 udev                               959M     0  959M   0% /dev
 tmpfs                              198M  1.5M  196M   1% /run
@@ -47,6 +50,7 @@ overlay                             29G  6.5G   21G  24% /run/k3s/containerd/io.
 overlay                             29G  6.5G   21G  24% /run/k3s/containerd/io.containerd.runtime.v2.task/k8s.io/610168b4cbf5dc341ec56e2a5e9b5b26faa6d18dbf6ad3824b088ece1ef54ee4/rootfs
 tmpfs                              198M  8.0K  198M   1% /run/user/1001
 --- Host: db-svr02
+--- Date: 2025-11-06
 Filesystem                      Size  Used Avail Use% Mounted on
 udev                            959M     0  959M   0% /dev
 tmpfs                           198M  600K  197M   1% /run
@@ -60,6 +64,7 @@ tmpfs                           1.0M     0  1.0M   0% /run/credentials/getty@tty
 overlay                          29G  3.8G   24G  14% /var/lib/docker/overlay2/d4c7d611b4afece1e06d4a760198aa27691eb942d29abe1527c1cc212a7431d7/merged
 tmpfs                           198M  8.0K  198M   1% /run/user/1001
 --- Host: mtg-webserver
+--- Date: 2025-11-06
 Filesystem                         Size  Used Avail Use% Mounted on
 tmpfs                              197M  1.1M  196M   1% /run
 /dev/mapper/ubuntu--vg-ubuntu--lv   30G  6.6G   22G  24% /
@@ -69,6 +74,7 @@ tmpfs                              5.0M     0  5.0M   0% /run/lock
 overlay                             30G  6.6G   22G  24% /var/lib/docker/overlay2/be0ebd126ecf0eb04e972dd0cb61daecc71e07c0dcd8c1ac4e89aa92122b36db/merged
 tmpfs                              197M   12K  197M   1% /run/user/1001
 --- Host: file-server
+--- Date: 2025-11-06
 Filesystem                         Size  Used Avail Use% Mounted on
 tmpfs                              197M  4.4M  193M   3% /run
 /dev/mapper/ubuntu--vg-ubuntu--lv  160G   51G  102G  34% /
@@ -78,6 +84,7 @@ tmpfs                              5.0M     0  5.0M   0% /run/lock
 overlay                            160G   51G  102G  34% /var/lib/docker/overlay2/e614a99ec6331bed8ad8b8a600b71be8a11c5b9f6beeafd6dfbca997bcbaafa5/merged
 tmpfs                              197M   12K  197M   1% /run/user/1001
 --- Host: debRed
+--- Date: 2025-11-06
 Filesystem                   Size  Used Avail Use% Mounted on
 udev                         456M     0  456M   0% /dev
 tmpfs                         97M  516K   97M   1% /run
@@ -91,6 +98,7 @@ tmpfs                        1.0M     0  1.0M   0% /run/credentials/getty@tty1.s
 tmpfs                         97M  8.0K   97M   1% /run/user/1000
 tmpfs                         97M  8.0K   97M   1% /run/user/1001
 --- Host: cloudcity-01
+--- Date: 2025-11-06
 Filesystem                         Size  Used Avail Use% Mounted on
 tmpfs                               97M  1.3M   95M   2% /run
 /dev/mapper/ubuntu--vg-ubuntu--lv   30G  8.0G   20G  29% /
@@ -101,6 +109,7 @@ overlay                             30G  8.0G   20G  29% /var/lib/docker/overlay
 overlay                             30G  8.0G   20G  29% /var/lib/docker/overlay2/36b4e0f76c2179a89c74cbcb01252e814c2b8a97b3b5f3845b9877cc4c6688ea/merged
 tmpfs                               97M   12K   97M   1% /run/user/1001
 --- Host: mandalore
+--- Date: 2025-11-06
 Filesystem                         Size  Used Avail Use% Mounted on
 tmpfs                              298M  2.9M  295M   1% /run
 /dev/mapper/ubuntu--vg-ubuntu--lv   61G   22G   37G  38% /
@@ -146,6 +155,7 @@ overlay                             61G   22G   37G  38% /var/lib/docker/overlay
 overlay                             61G   22G   37G  38% /var/lib/docker/overlay2/b71fc52275f7809108b0a18150b696b19819e5f7bf56a738f5e9e7b504e7950f/merged
 tmpfs                              298M   12K  298M   1% /run/user/1001
 --- Host: db-svr01
+--- Date: 2025-11-06
 Filesystem                      Size  Used Avail Use% Mounted on
 udev                            959M     0  959M   0% /dev
 tmpfs                           198M  600K  197M   1% /run
@@ -159,6 +169,7 @@ tmpfs                           1.0M     0  1.0M   0% /run/credentials/getty@tty
 overlay                          29G  5.4G   22G  20% /var/lib/docker/overlay2/d96cdd9269b6f953d1c33685c9983a7bd2eb71362669f93f0e1de334208b8f10/merged
 tmpfs                           198M  8.0K  198M   1% /run/user/1001
 --- Host: dev-svr02
+--- Date: 2025-11-06
 Filesystem                         Size  Used Avail Use% Mounted on
 tmpfs                              392M  992K  391M   1% /run
 /dev/mapper/ubuntu--vg-ubuntu--lv   30G  6.5G   22G  24% /
@@ -167,6 +178,7 @@ tmpfs                              5.0M     0  5.0M   0% /run/lock
 /dev/sda2                          2.0G  102M  1.7G   6% /boot
 tmpfs                              392M   12K  392M   1% /run/user/1001
 --- Host: shire
+--- Date: 2025-11-06
 Filesystem                         Size  Used Avail Use% Mounted on
 tmpfs                              392M  1.2M  391M   1% /run
 /dev/mapper/ubuntu--vg-ubuntu--lv   61G   14G   44G  24% /
@@ -176,6 +188,7 @@ tmpfs                              5.0M     0  5.0M   0% /run/lock
 overlay                             61G   14G   44G  24% /var/lib/docker/overlay2/e2768225e09e23462f296d5f686c62dbcda4acb41b619c487476f0ae87db7f4d/merged
 tmpfs                              392M   12K  392M   1% /run/user/1001
 --- Host: localhost
+--- Date: 2025-11-06
 Filesystem               Size  Used Avail Use% Mounted on
 /dev/mapper/fedora-root   15G  2.8G   13G  19% /
 devtmpfs                 957M     0  957M   0% /dev
@@ -189,6 +202,7 @@ tmpfs                    1.0M     0  1.0M   0% /run/credentials/getty@tty1.servi
 tmpfs                    196M  4.0K  196M   1% /run/user/1000
 tmpfs                    196M  4.0K  196M   1% /run/user/1001
 --- Host: dev-svr
+--- Date: 2025-11-06
 Filesystem                     Size  Used Avail Use% Mounted on
 udev                           456M     0  456M   0% /dev
 tmpfs                           97M  512K   97M   1% /run

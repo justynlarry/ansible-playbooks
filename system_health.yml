@@ -55,7 +55,9 @@
         mode: '0644'
         content: |
           --- Host: {{ ansible_hostname }}
+          --- Date: {{ ansible_date_time.date }}
           {{ disk_info.stdout | default('N/A') }}
+
 
 #          {{ C_BOLD }}{{ C_RED }}--- FAILED SERVICES ---{{ C_RESET }}
 #          {{ failed_services.stdout | default('None detected') }}
