@@ -8,3 +8,4 @@ services:
 #      - ./html:/var/www/html/daily_logs
       - ./default.conf:/etc/nginx/conf.d/default.conf:ro
       - ./html:/var/www/html:ro
+    restart: unless-stopped
