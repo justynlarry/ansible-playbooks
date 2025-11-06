@@ -54,16 +54,7 @@
         group: root
         mode: '0644'
         content: |
-          {% set C_BLUE = '\033[34m' %}
-          {% set C_GREEN = '\033[32m' %}
-          {% set C_RED = '\033[31m' %}
-          {% set C_YELLOW = '\033[33m' %}
-          {% set C_PURPLE = '\033[35m' %}
-          {% set C_CYAN = '\033[36m' %}
-          {% set C_BOLD = '\033[1m' %}
-          {% set C_RESET = '\033[0m' %}
-
-          {{ C_BOLD }}{{ C_BLUE }}### Host: {{ ansible_hostname }} {{ C_RESET }}
+          --- Host: {{ ansible_hostname }}
           {{ disk_info.stdout | default('N/A') }}
 
 #          {{ C_BOLD }}{{ C_RED }}--- FAILED SERVICES ---{{ C_RESET }}
