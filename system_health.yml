@@ -56,6 +56,7 @@
         content: |
           --- Host: {{ ansible_hostname }}
           --- Date: {{ ansible_date_time.date }}
+          --- UUID: {{ ansible_product_uuid }}
           {{ disk_info.stdout | default('N/A') }}
 
 
@@ -127,9 +128,11 @@
       ansible.builtin.shell: |
         # Use the consistent local_date fact for file matching
         cat {{ combined_report_dir }}/*/daily_report{{ local_date }}.log >> {{ combined_report_dir }}/system_health.log
+        # Remove original individual reports and sub-directories
+        find {{ combined_report_dir }} -type f -name "daily_report{{ local_date }}.log" -delete
+        find {{ combined_report_dir }} -mindepth 1 -type d -empty -delete
       args:
         executable: /bin/bash
-      # Add this to prevent it from failing if no files are found (e.g., first run on a new day)
       ignore_errors: yes
 
     - name: Display Combined Report Summary Path
@@ -140,3 +143,4 @@
 #      copy:
 #        src: "{{ combined_report_dir }}/system_health_{{ local_date }}.log"
 #        dest: "web_log/html/daily_logs/system_health_{{ local_date }}.log"
+
