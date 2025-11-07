@@ -22,7 +22,7 @@ def parse_df_output(filename):
                 if len(parts) > 1:
                     current_hostname = parts[1].strip().split()[0]
                 continue
-            
+
             if line.startswith('--- Date:'):
                 parts = line.split(':')
                 if len(parts) > 1:
@@ -47,7 +47,9 @@ def parse_df_output(filename):
                 })
 
     return pd.DataFrame(data)
-df = parse_df_output('system_health_2025-11-06.log')
+
+log_path = '../system_reports/system_health.log'
+df = parse_df_output(log_path)
 
 with open("output.txt", "w") as file:
     file.write(df.to_string())
