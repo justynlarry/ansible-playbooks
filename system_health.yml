@@ -137,7 +137,7 @@
 
     - name: Display Combined Report Summary Path
       ansible.builtin.debug:
-        msg: "Combined Daily report saved at: {{ combined_report_dir }}/system_health_{{ local_date }}.log"
+        msg: "Combined Daily report saved at: {{ combined_report_dir }}/system_health.log"
 
 #    - name: Copy Combined Report to system_reports
 #      copy:

@@ -25,8 +25,16 @@ def parse_df_output(filename):
 
             if line.startswith('--- Date:'):
                 parts = line.split(':')
+                
                 if len(parts) > 1:
                     current_date = parts[1].strip().split()[0]
+                continue
+
+            if line.startswith('--- UUID'):
+                parts = line.split(':')
+                
+                if len(parts) > 1:
+                    vm_uuid = parts[1].strip().split()[0]
                 continue
 
             if line.startswith('Filesystem'):
@@ -36,6 +44,7 @@ def parse_df_output(filename):
 
             if len(fields) >=6:
                 data.append({
+                    'UUID' : vm_uuid,
                     'Hostname' : current_hostname,
                     'Date' : current_date,
                     'Filesystem' : fields[0],
