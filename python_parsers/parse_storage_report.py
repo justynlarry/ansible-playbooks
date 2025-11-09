@@ -60,5 +60,12 @@ def parse_df_output(filename):
 log_path = '../system_reports/system_health.log'
 df = parse_df_output(log_path)
 
-with open("output.txt", "w") as file:
+if not df.empty:
+    file_date = df['Date'].iloc[0]
+else:
+    file_date = "NO-Date"
+
+output_filename = f"disk_storage_output_{file_date}.txt"
+
+with open(output_filename, "w") as file:
     file.write(df.to_string())
