@@ -14,6 +14,19 @@ def parse_output(filename):
 
     current_hostname = current_date = vm_uuid = "N/A"
 
+    def flush_section():
+        """Save the current section based on mode."""
+        nonlocal section_lines, mode
+        if not section_lines:
+            return
+        if mode == 'df':
+            storage_sections.append((section_lines, current_hostname, current_date, vm_uuid))
+        elif mode == 'services':
+            service_sections.append((section_lines, current_hostname, current_date, vm_uuid))
+        elif mode == 'critical':
+            critical_sections.append((section_lines, current_hostname, current_date, vm_uuid))
+        section_lines=[]
+
     with open(filename, "r") as f:
         for line in f:
             line = line.strip()
@@ -22,6 +35,7 @@ def parse_output(filename):
 
             # --- Metadata lines ---
             if line.startswith('--- Host:'):
+                flush_section()
                 current_hostname = line.split(':', 1)[1].strip().split()[0]
                 continue
             if line.startswith('--- Date:'):
@@ -33,39 +47,24 @@ def parse_output(filename):
 
             # --- Section control ---
             if line.startswith('Filesystem'):
-                # finished collecting services section
-                if section_lines and mode == 'services' and mode == 'critical':
-                    service_sections.append((section_lines, current_hostname, current_date, vm_uuid))
-                section_lines = []
+                flush_section()
                 mode = 'df'
                 continue
 
             elif line.startswith('--- FAILED SERVICES'):
-                # finished collecting df section
-                if section_lines and mode == 'df' and mode == 'critical':
-                    storage_sections.append((section_lines, current_hostname, current_date, vm_uuid))
-                section_lines = []
+                flush_section()
                 mode = 'services'
                 continue
 
             elif line.startswith('--- CRITICAL LOGS'):
-                if section_lines and mode == 'df' and mode == 'services':
-                    critical_sections.append((section_lines, current_hostname, current_date, vm_uuid))
-                section_lines = []
+                flush_section()
                 mode = 'critical'
                 continue
 
             # --- Add content to current section ---
             section_lines.append(line)
-
-        # Handle last section after file ends
-        if section_lines:
-            if mode == 'df':
-                storage_sections.append((section_lines, current_hostname, current_date, vm_uuid))
-            elif mode == 'services':
-                service_sections.append((section_lines, current_hostname, current_date, vm_uuid))
-            elif mode == 'critical':
-                critical_sections.append((section_lines, current_hostname, current_date, vm_uuid))
+        
+        flush_section()
 
     # --- Send sections to sub-parsers ---
     storage_frames = [
