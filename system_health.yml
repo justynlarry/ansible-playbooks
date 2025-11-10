@@ -20,16 +20,17 @@
 
     # --- Disk Usage  ---
 
-    - name: Get Disk Usage
-      ansible.builtin.command:
-        cmd: df -h
+    - name: Get Filtered Disk Usage
+      ansible.builtin.shell:
+        df -h |
+        grep -Ev 'tmpfs|udev|/run|/dev/shm|/run/user|overlay'
       register: disk_info
 
     # --- Systemd Service Check ---- 
 
-#    - name: Check for Failed Systemd Services
-#      ansible.builtin.shell: systemctl --failed --no-pager || true
-#      register: failed_services
+    - name: Check for Failed Systemd Services
+      ansible.builtin.shell: systemctl --failed --no-pager || true
+      register: failed_services
 
     # --- Log Checks ---
 
@@ -60,8 +61,8 @@
           {{ disk_info.stdout | default('N/A') }}
 
 
-#          {{ C_BOLD }}{{ C_RED }}--- FAILED SERVICES ---{{ C_RESET }}
-#          {{ failed_services.stdout | default('None detected') }}
+          --- FAILED SERVICES ---
+          {{ failed_services.stdout | default('None detected') }}
 
 #          {% set log_content = log_critical.stdout | default('-- No entries --') | trim %}
 #          {{ C_BOLD }}{{ C_RED }}--- CRITICAL LOGS (journalctl -p 3) ---{{ C_RESET }}
