@@ -69,3 +69,87 @@ adf784e4-92a5-4d6e-bcbb-18e3dcdf7481	dev-svr03	2025-11-10	░░ A start job for
 adf784e4-92a5-4d6e-bcbb-18e3dcdf7481	dev-svr03	2025-11-10	░░
 adf784e4-92a5-4d6e-bcbb-18e3dcdf7481	dev-svr03	2025-11-10	░░ The job identifier is 14227 and the job result is failed.
 df514d74-d3d4-45dc-956b-d44bfd49ab1f	dev-svr	2025-11-10	-- No entries --
+4997cc22-7241-4db8-8071-e36b88effa84	ubred	2025-11-10	Oct 30 19:45:37 ubred sshd[924]: error: ioctl(TIOCSCTTY): Input/output error
+4997cc22-7241-4db8-8071-e36b88effa84	ubred	2025-11-10	Oct 30 19:45:37 ubred sshd[924]: error: /dev/pts/0: No such file or directory
+4997cc22-7241-4db8-8071-e36b88effa84	ubred	2025-11-10	Oct 30 19:45:37 ubred sshd[924]: error: open /dev/tty failed - could not set controlling tty: No such device or address
+4997cc22-7241-4db8-8071-e36b88effa84	ubred	2025-11-10	No pending updates
+4450e93d-545a-4844-9e34-70acad05dcb2	ubred2	2025-11-10	-- No entries --
+4450e93d-545a-4844-9e34-70acad05dcb2	ubred2	2025-11-10	No pending updates
+778a86f2-a80f-457a-9376-b31a2bfb4949	sys-monitor	2025-11-10	-- No entries --
+778a86f2-a80f-457a-9376-b31a2bfb4949	sys-monitor	2025-11-10	No pending updates
+17437b18-e881-4429-ac20-65a8ee6a09ed	mtg-webserver	2025-11-10	"Nov 06 13:49:50 mtg-webserver networkctl[72185]: Interface ""vethef8b962"" not found."
+17437b18-e881-4429-ac20-65a8ee6a09ed	mtg-webserver	2025-11-10	No pending updates
+0c50944d-f595-45c1-a769-6a33d8e35c0f	file-server	2025-11-10	"Nov 06 13:49:59 file-server networkctl[56608]: Interface ""veth558d8e8"" not found."
+0c50944d-f595-45c1-a769-6a33d8e35c0f	file-server	2025-11-10	"Nov 06 13:49:59 file-server networkctl[56614]: Interface ""vethfe31426"" not found."
+0c50944d-f595-45c1-a769-6a33d8e35c0f	file-server	2025-11-10	Nov 10 17:49:22 file-server login[79282]: PAM unable to dlopen(pam_lastlog.so): /usr/lib/security/pam_lastlog.so: cannot open shared object file: No such file or directory
+0c50944d-f595-45c1-a769-6a33d8e35c0f	file-server	2025-11-10	Nov 10 17:49:22 file-server login[79282]: PAM adding faulty module: pam_lastlog.so
+0c50944d-f595-45c1-a769-6a33d8e35c0f	file-server	2025-11-10	Nov 10 18:17:42 file-server login[79574]: PAM unable to dlopen(pam_lastlog.so): /usr/lib/security/pam_lastlog.so: cannot open shared object file: No such file or directory
+0c50944d-f595-45c1-a769-6a33d8e35c0f	file-server	2025-11-10	Nov 10 18:17:42 file-server login[79574]: PAM adding faulty module: pam_lastlog.so
+0c50944d-f595-45c1-a769-6a33d8e35c0f	file-server	2025-11-10	Nov 10 18:27:08 file-server login[79742]: PAM unable to dlopen(pam_lastlog.so): /usr/lib/security/pam_lastlog.so: cannot open shared object file: No such file or directory
+0c50944d-f595-45c1-a769-6a33d8e35c0f	file-server	2025-11-10	Nov 10 18:27:08 file-server login[79742]: PAM adding faulty module: pam_lastlog.so
+0c50944d-f595-45c1-a769-6a33d8e35c0f	file-server	2025-11-10	No pending updates
+b65a18ee-f312-475f-9046-59808f52bab4	db-svr02	2025-11-10	-- No entries --
+b65a18ee-f312-475f-9046-59808f52bab4	db-svr02	2025-11-10	No pending updates
+3e8eefeb-71f7-494e-af3b-d8ce2fe1b720	debRed	2025-11-10	Oct 30 13:43:44 debRed systemd[1]: Failed to start apache2.service - The Apache HTTP Server.
+3e8eefeb-71f7-494e-af3b-d8ce2fe1b720	debRed	2025-11-10	░░ Subject: A start job for unit apache2.service has failed
+3e8eefeb-71f7-494e-af3b-d8ce2fe1b720	debRed	2025-11-10	░░ Defined-By: systemd
+3e8eefeb-71f7-494e-af3b-d8ce2fe1b720	debRed	2025-11-10	░░ Support: https://www.debian.org/support
+3e8eefeb-71f7-494e-af3b-d8ce2fe1b720	debRed	2025-11-10	░░
+3e8eefeb-71f7-494e-af3b-d8ce2fe1b720	debRed	2025-11-10	░░ A start job for unit apache2.service has finished with a failure.
+3e8eefeb-71f7-494e-af3b-d8ce2fe1b720	debRed	2025-11-10	░░
+3e8eefeb-71f7-494e-af3b-d8ce2fe1b720	debRed	2025-11-10	░░ The job identifier is 114 and the job result is failed.
+3e8eefeb-71f7-494e-af3b-d8ce2fe1b720	debRed	2025-11-10	No pending updates
+345598a0-7aab-4b74-a4e0-2e9ba3ed69eb	cloudcity-01	2025-11-10	-- No entries --
+345598a0-7aab-4b74-a4e0-2e9ba3ed69eb	cloudcity-01	2025-11-10	No pending updates
+008df209-cbb1-418c-bd4c-49d3eb4dd359	mandalore	2025-11-10	Nov 06 22:01:54 mandalore login[2565627]: PAM unable to dlopen(pam_lastlog.so): /usr/lib/security/pam_lastlog.so: cannot open shared object file: No such file or directory
+008df209-cbb1-418c-bd4c-49d3eb4dd359	mandalore	2025-11-10	Nov 06 22:01:54 mandalore login[2565627]: PAM adding faulty module: pam_lastlog.so
+008df209-cbb1-418c-bd4c-49d3eb4dd359	mandalore	2025-11-10	Nov 10 15:54:34 mandalore login[3907246]: PAM unable to dlopen(pam_lastlog.so): /usr/lib/security/pam_lastlog.so: cannot open shared object file: No such file or directory
+008df209-cbb1-418c-bd4c-49d3eb4dd359	mandalore	2025-11-10	Nov 10 15:54:34 mandalore login[3907246]: PAM adding faulty module: pam_lastlog.so
+008df209-cbb1-418c-bd4c-49d3eb4dd359	mandalore	2025-11-10	No pending updates
+072b0a23-f36d-4573-a383-bd60bad70786	db-svr01	2025-11-10	Nov 05 08:21:46 db-svr01 (sd-pam)[22886]: pam_systemd(systemd-user:session): Failed to release session: Caller does not belong to any known session.
+072b0a23-f36d-4573-a383-bd60bad70786	db-svr01	2025-11-10	No pending updates
+46b484fb-bca0-4377-a79d-fbe171124019	dev-svr02	2025-11-10	-- No entries --
+46b484fb-bca0-4377-a79d-fbe171124019	dev-svr02	2025-11-10	No pending updates
+97e46a4d-fe9e-4bad-b6b8-c2055dd7ed82	shire	2025-11-10	Oct 31 08:59:20 shire login[8771]: PAM unable to dlopen(pam_lastlog.so): /usr/lib/security/pam_lastlog.so: cannot open shared object file: No such file or directory
+97e46a4d-fe9e-4bad-b6b8-c2055dd7ed82	shire	2025-11-10	Oct 31 08:59:20 shire login[8771]: PAM adding faulty module: pam_lastlog.so
+97e46a4d-fe9e-4bad-b6b8-c2055dd7ed82	shire	2025-11-10	Oct 31 09:24:39 shire login[8996]: PAM unable to dlopen(pam_lastlog.so): /usr/lib/security/pam_lastlog.so: cannot open shared object file: No such file or directory
+97e46a4d-fe9e-4bad-b6b8-c2055dd7ed82	shire	2025-11-10	Oct 31 09:24:39 shire login[8996]: PAM adding faulty module: pam_lastlog.so
+97e46a4d-fe9e-4bad-b6b8-c2055dd7ed82	shire	2025-11-10	Nov 05 11:15:08 shire login[70581]: PAM unable to dlopen(pam_lastlog.so): /usr/lib/security/pam_lastlog.so: cannot open shared object file: No such file or directory
+97e46a4d-fe9e-4bad-b6b8-c2055dd7ed82	shire	2025-11-10	Nov 05 11:15:08 shire login[70581]: PAM adding faulty module: pam_lastlog.so
+97e46a4d-fe9e-4bad-b6b8-c2055dd7ed82	shire	2025-11-10	"Nov 06 06:49:48 shire networkctl[78499]: Interface ""veth84bbe44"" not found."
+97e46a4d-fe9e-4bad-b6b8-c2055dd7ed82	shire	2025-11-10	Nov 06 14:22:22 shire login[81248]: PAM unable to dlopen(pam_lastlog.so): /usr/lib/security/pam_lastlog.so: cannot open shared object file: No such file or directory
+97e46a4d-fe9e-4bad-b6b8-c2055dd7ed82	shire	2025-11-10	Nov 06 14:22:22 shire login[81248]: PAM adding faulty module: pam_lastlog.so
+97e46a4d-fe9e-4bad-b6b8-c2055dd7ed82	shire	2025-11-10	Nov 06 14:22:37 shire login[81411]: PAM unable to dlopen(pam_lastlog.so): /usr/lib/security/pam_lastlog.so: cannot open shared object file: No such file or directory
+97e46a4d-fe9e-4bad-b6b8-c2055dd7ed82	shire	2025-11-10	Nov 06 14:22:37 shire login[81411]: PAM adding faulty module: pam_lastlog.so
+97e46a4d-fe9e-4bad-b6b8-c2055dd7ed82	shire	2025-11-10	Nov 06 14:25:30 shire login[81501]: PAM unable to dlopen(pam_lastlog.so): /usr/lib/security/pam_lastlog.so: cannot open shared object file: No such file or directory
+97e46a4d-fe9e-4bad-b6b8-c2055dd7ed82	shire	2025-11-10	Nov 06 14:25:30 shire login[81501]: PAM adding faulty module: pam_lastlog.so
+97e46a4d-fe9e-4bad-b6b8-c2055dd7ed82	shire	2025-11-10	Nov 10 10:48:44 shire login[115451]: PAM unable to dlopen(pam_lastlog.so): /usr/lib/security/pam_lastlog.so: cannot open shared object file: No such file or directory
+97e46a4d-fe9e-4bad-b6b8-c2055dd7ed82	shire	2025-11-10	Nov 10 10:48:44 shire login[115451]: PAM adding faulty module: pam_lastlog.so
+97e46a4d-fe9e-4bad-b6b8-c2055dd7ed82	shire	2025-11-10	Nov 10 10:51:03 shire login[115631]: PAM unable to dlopen(pam_lastlog.so): /usr/lib/security/pam_lastlog.so: cannot open shared object file: No such file or directory
+97e46a4d-fe9e-4bad-b6b8-c2055dd7ed82	shire	2025-11-10	Nov 10 10:51:03 shire login[115631]: PAM adding faulty module: pam_lastlog.so
+97e46a4d-fe9e-4bad-b6b8-c2055dd7ed82	shire	2025-11-10	Nov 10 11:23:34 shire login[115953]: PAM unable to dlopen(pam_lastlog.so): /usr/lib/security/pam_lastlog.so: cannot open shared object file: No such file or directory
+97e46a4d-fe9e-4bad-b6b8-c2055dd7ed82	shire	2025-11-10	Nov 10 11:23:34 shire login[115953]: PAM adding faulty module: pam_lastlog.so
+97e46a4d-fe9e-4bad-b6b8-c2055dd7ed82	shire	2025-11-10	Nov 10 11:25:10 shire login[116044]: PAM unable to dlopen(pam_lastlog.so): /usr/lib/security/pam_lastlog.so: cannot open shared object file: No such file or directory
+97e46a4d-fe9e-4bad-b6b8-c2055dd7ed82	shire	2025-11-10	Nov 10 11:25:10 shire login[116044]: PAM adding faulty module: pam_lastlog.so
+97e46a4d-fe9e-4bad-b6b8-c2055dd7ed82	shire	2025-11-10	No pending updates
+adf784e4-92a5-4d6e-bcbb-18e3dcdf7481	dev-svr03	2025-11-10	Nov 10 08:07:24 dev-svr03 auditd[8468]: plugin /usr/sbin/sedispatch terminated unexpectedly
+adf784e4-92a5-4d6e-bcbb-18e3dcdf7481	dev-svr03	2025-11-10	Nov 10 08:07:24 dev-svr03 systemd[1]: Failed to start auditd.service - Security Audit Logging Service.
+adf784e4-92a5-4d6e-bcbb-18e3dcdf7481	dev-svr03	2025-11-10	░░ Subject: A start job for unit auditd.service has failed
+adf784e4-92a5-4d6e-bcbb-18e3dcdf7481	dev-svr03	2025-11-10	░░ Defined-By: systemd
+adf784e4-92a5-4d6e-bcbb-18e3dcdf7481	dev-svr03	2025-11-10	░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+adf784e4-92a5-4d6e-bcbb-18e3dcdf7481	dev-svr03	2025-11-10	░░
+adf784e4-92a5-4d6e-bcbb-18e3dcdf7481	dev-svr03	2025-11-10	░░ A start job for unit auditd.service has finished with a failure.
+adf784e4-92a5-4d6e-bcbb-18e3dcdf7481	dev-svr03	2025-11-10	░░
+adf784e4-92a5-4d6e-bcbb-18e3dcdf7481	dev-svr03	2025-11-10	░░ The job identifier is 14217 and the job result is failed.
+adf784e4-92a5-4d6e-bcbb-18e3dcdf7481	dev-svr03	2025-11-10	Nov 10 08:08:54 dev-svr03 auditd[8506]: plugin /usr/sbin/sedispatch terminated unexpectedly
+adf784e4-92a5-4d6e-bcbb-18e3dcdf7481	dev-svr03	2025-11-10	Nov 10 08:08:55 dev-svr03 systemd[1]: Failed to start auditd.service - Security Audit Logging Service.
+adf784e4-92a5-4d6e-bcbb-18e3dcdf7481	dev-svr03	2025-11-10	░░ Subject: A start job for unit auditd.service has failed
+adf784e4-92a5-4d6e-bcbb-18e3dcdf7481	dev-svr03	2025-11-10	░░ Defined-By: systemd
+adf784e4-92a5-4d6e-bcbb-18e3dcdf7481	dev-svr03	2025-11-10	░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+adf784e4-92a5-4d6e-bcbb-18e3dcdf7481	dev-svr03	2025-11-10	░░
+adf784e4-92a5-4d6e-bcbb-18e3dcdf7481	dev-svr03	2025-11-10	░░ A start job for unit auditd.service has finished with a failure.
+adf784e4-92a5-4d6e-bcbb-18e3dcdf7481	dev-svr03	2025-11-10	░░
+adf784e4-92a5-4d6e-bcbb-18e3dcdf7481	dev-svr03	2025-11-10	░░ The job identifier is 14227 and the job result is failed.
+adf784e4-92a5-4d6e-bcbb-18e3dcdf7481	dev-svr03	2025-11-10	No pending updates
+df514d74-d3d4-45dc-956b-d44bfd49ab1f	dev-svr	2025-11-10	-- No entries --
+df514d74-d3d4-45dc-956b-d44bfd49ab1f	dev-svr	2025-11-10	No pending updates
