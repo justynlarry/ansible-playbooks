@@ -1,85 +1,38 @@
 import pandas as pd
-import io
-import re
-from parse_report import mode 
 
-def parse_df_output(filename):
-    """Parses concatenated df -h output, handling headers and host tags."""
+def parse(filename):
+    """Parses df -h log into a DataFrame."""
     data = []
-    current_hostname = "N/A"
-    current_date = "N/A"
-
-    """Set 'section' flags to help parser delineate between report segments"""
-    in_df_section = False
-    in_service_section = False
+    hostname = date = uuid = "N/A"
 
     with open(filename, 'r') as f:
         for line in f:
             line = line.strip()
-
             if not line:
                 continue
 
             if line.startswith('--- Host:'):
-                parts = line.split(':')
-                
-                if len(parts) > 1:
-                    current_hostname = parts[1].strip().split()[0]
+                hostname = line.split(':')[1].strip().split()[0]
                 continue
-
             if line.startswith('--- Date:'):
-                parts = line.split(':')
-                
-                if len(parts) > 1:
-                    current_date = parts[1].strip().split()[0]
+                date = line.split(':')[1].strip().split()[0]
                 continue
-
             if line.startswith('--- UUID'):
-                parts = line.split(':')
-                
-                if len(parts) > 1:
-                    vm_uuid = parts[1].strip().split()[0]
-                continue
-
-            if line.startswith('Filesystem'):
-                in_df_section = True
-                in_service_section = False
-                continue
-
-            if line.startswith('--- FAILED SERVICES ---'):
-                in_df_section = False
-                in_service_section = True
-
-            if line.startswith('0 loaded units listed.'):
-                in_service_section = False
+                uuid = line.split(':')[1].strip().split()[0]
                 continue
 
             fields = line.split()
-
-            if parse_report.mode == 'df' and len(fields) >=6:
+            if len(fields) >= 6 and not line.startswith('Filesystem'):
                 data.append({
-                    'UUID' : vm_uuid,
-                    'Hostname' : current_hostname,
-                    'Date' : current_date,
-                    'Filesystem' : fields[0],
-                    'Size' : fields[1],
-                    'Used' : fields[2],
-                    'Avail' : fields[3],
-                    'Use%' : fields[4],
-                    'Mounted on' : fields[5],
+                    'UUID': uuid,
+                    'Hostname': hostname,
+                    'Date': date,
+                    'Filesystem': fields[0],
+                    'Size': fields[1],
+                    'Used': fields[2],
+                    'Avail': fields[3],
+                    'Use%': fields[4],
+                    'Mounted on': fields[5],
                 })
 
     return pd.DataFrame(data)
-
-log_path = '../system_reports/system_health.log'
-df = parse_df_output(log_path)
-
-if not df.empty:
-    file_date = df['Date'].iloc[0]
-else:
-    file_date = "NO-Date"
-
-output_filename = f"disk_storage_output_{file_date}.txt"
-
-with open(output_filename, "w") as file:
-    file.write(df.to_string())

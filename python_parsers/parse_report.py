@@ -1,64 +1,26 @@
 import pandas as pd
-import io
-import re
-"""Import Modules"""
 import parse_storage_report
-import parse_services_report 
+import parse_services_report
 
-def parse_output(filename):
-    """Parses concatenated df -h output, handling headers and host tags."""
-    data = []
-    current_hostname = "N/A"
-    current_date = "N/A"
+storage_log_path = '../system_reports/df_report.log'
+services_log_path = '../system_reports/services_report.log'
 
-    """Set mode to help parser delineate between report segments"""
-    mode = None
+df = parse_storage_report.parse(storage_log_path)
+svc = parse_services_report.parse(services_log_path)
 
-    with open(filename, 'r') as f:
-        for line in f:
-            line = line.strip()
-
-            if not line:
-                continue
-
-            if line.startswith('--- Host:'):
-                parts = line.split(':')
-                
-                if len(parts) > 1:
-                    current_hostname = parts[1].strip().split()[0]
-                continue
-
-            if line.startswith('--- Date:'):
-                parts = line.split(':')
-                
-                if len(parts) > 1:
-                    current_date = parts[1].strip().split()[0]
-                continue
-
-            if line.startswith('--- UUID'):
-                parts = line.split(':')
-                
-                if len(parts) > 1:
-                    vm_uuid = parts[1].strip().split()[0]
-                continue
-            if line.startswith('Filesystem'):
-                mode = 'df'
-                parse_storage_report()
-            elif line.startswith('--- FAILED SERVICES ---'):
-                mode = 'services'
-                parse_services_report()
-
-    return pd.DataFrame(data)
-
-log_path = '../system_reports/system_health.log'
-df = parse_df_output(log_path)
-
+file_date = "NO-Date"
 if not df.empty:
     file_date = df['Date'].iloc[0]
-else:
-    file_date = "NO-Date"
+elif not svc.empty:
+    file_date = svc['Date'].iloc[0]
 
-output_filename = f"disk_storage_output_{file_date}.txt"
+output_storage = f"disk_storage_output_{file_date}.txt"
+output_services = f"services_output_{file_date}.txt"
 
-with open(output_filename, "w") as file:
-    file.write(df.to_string())
+if not df.empty:
+    df.to_csv(output_storage, sep='\t', index=False)
+if not svc.empty:
+    svc.to_csv(output_services, sep='\t', index=False)
+
+print(f"Storage report written to: {output_storage}")
+print(f"Services report written to: {output_services}")

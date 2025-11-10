@@ -1,33 +1,33 @@
 import pandas as pd
-import io
-import re
 
-def parse_svc_output(filename):
-    """Parses concatenated 'systemctl --failed || true' output"""
+def parse(filename):
+    """Parses FAILED SERVICES log into a DataFrame."""
     data = []
-    current_hostname = "N/A"
-    current_date = "N/A"
-
-    """Set 'section' flags to help parser delineate between report segments"""
-    in_df_section = False
-    in_service_section = False
+    hostname = date = uuid = "N/A"
 
     with open(filename, 'r') as f:
         for line in f:
             line = line.strip()
-
             if not line:
                 continue
 
-            if line.startswith('--- Host'):
-                parts = line.split(':')
-
-                if len(parts) > 1:
-                    current_hostname = parts[1].strip().split()[0]
+            if line.startswith('--- Host:'):
+                hostname = line.split(':')[1].strip().split()[0]
+                continue
+            if line.startswith('--- Date:'):
+                date = line.split(':')[1].strip().split()[0]
+                continue
+            if line.startswith('--- UUID'):
+                uuid = line.split(':')[1].strip().split()[0]
                 continue
 
-            if line.startswith('--- Date'):
-                parts = line.split(':')
+            # Only record non-header service lines
+            if not line.startswith('---') and not line.startswith('0 loaded units'):
+                data.append({
+                    'UUID': uuid,
+                    'Hostname': hostname,
+                    'Date': date,
+                    'Service': line
+                })
 
-                if len(parts) > 1:
-                    current_date = 
+    return pd.DataFrame(data)
