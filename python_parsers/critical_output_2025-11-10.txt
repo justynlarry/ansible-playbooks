@@ -1,0 +1,2 @@
+UUID	Hostname	Date	Critical Log
+df514d74-d3d4-45dc-956b-d44bfd49ab1f	dev-svr	2025-11-10	-- No entries --
