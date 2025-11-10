@@ -1,17 +1,18 @@
 import pandas as pd
 import io
 import re
-from parse_report import mode 
+"""Import Modules"""
+import parse_storage_report
+import parse_services_report 
 
-def parse_df_output(filename):
+def parse_output(filename):
     """Parses concatenated df -h output, handling headers and host tags."""
     data = []
     current_hostname = "N/A"
     current_date = "N/A"
 
-    """Set 'section' flags to help parser delineate between report segments"""
-    in_df_section = False
-    in_service_section = False
+    """Set mode to help parser delineate between report segments"""
+    mode = None
 
     with open(filename, 'r') as f:
         for line in f:
@@ -40,34 +41,12 @@ def parse_df_output(filename):
                 if len(parts) > 1:
                     vm_uuid = parts[1].strip().split()[0]
                 continue
-
             if line.startswith('Filesystem'):
-                in_df_section = True
-                in_service_section = False
-                continue
-
-            if line.startswith('--- FAILED SERVICES ---'):
-                in_df_section = False
-                in_service_section = True
-
-            if line.startswith('0 loaded units listed.'):
-                in_service_section = False
-                continue
-
-            fields = line.split()
-
-            if parse_report.mode == 'df' and len(fields) >=6:
-                data.append({
-                    'UUID' : vm_uuid,
-                    'Hostname' : current_hostname,
-                    'Date' : current_date,
-                    'Filesystem' : fields[0],
-                    'Size' : fields[1],
-                    'Used' : fields[2],
-                    'Avail' : fields[3],
-                    'Use%' : fields[4],
-                    'Mounted on' : fields[5],
-                })
+                mode = 'df'
+                parse_storage_report()
+            elif line.startswith('--- FAILED SERVICES ---'):
+                mode = 'services'
+                parse_services_report()
 
     return pd.DataFrame(data)
 
