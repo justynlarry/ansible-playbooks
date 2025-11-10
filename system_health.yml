@@ -34,17 +34,17 @@
 
     # --- Log Checks ---
 
-#    - name: Get High-Priority Logs (errors and criticals)
-#      ansible.builtin.command: journalctl -p 3 -xb --no-pager
-#      register: log_critical
-#      changed_when: false
+    - name: Get High-Priority Logs (errors and criticals)
+      ansible.builtin.command: journalctl -p 3 -xb --no-pager
+      register: log_critical
+      changed_when: false
 
     # --- Optional Security & SSH Review ---
 
-#    - name: Check Recent Failed SSH Logins
-#      ansible.builtin.shell: journalctl -u ssh -p 4 --since "24 hours ago" --no-pager || true
-#      register: ssh_failed
-#      changed_when: false
+    - name: Check Recent Failed SSH Logins
+      ansible.builtin.shell: journalctl -u ssh -p 4 --since "24 hours ago" --no-pager || true
+      register: ssh_failed
+      changed_when: false
 
     # --- Write to Log File ---
 
@@ -64,25 +64,24 @@
           --- FAILED SERVICES ---
           {{ failed_services.stdout | default('None detected') }}
 
-#          {% set log_content = log_critical.stdout | default('-- No entries --') | trim %}
-#          {{ C_BOLD }}{{ C_RED }}--- CRITICAL LOGS (journalctl -p 3) ---{{ C_RESET }}
-#          {% if log_content != '-- No entries --' %}
-#          {{ C_CYAN }}{{ log_content }}{{ C_RESET }}
-#          {% else %}
-#          {{ C_RESET }}{{ log_content }}
-#          {% endif %}
+          {% set log_content = log_critical.stdout | default('-- No entries --') | trim %}
+          --- CRITICAL LOGS (journalctl -p 3) ---
+          {% if log_content != '-- No entries --' %}
+          {{ log_content }}
+          {% else %}
+          {{ log_content }}
+          {% endif %}
 
-#         {{ C_BOLD }}{{ C_PURPLE }}--- PENDING UPDATES ---{{ C_RESET }}
-#          {% if ansible_os_family == 'Debian' %}
-#          {{ apt_updates.stdout | default('No pending updates') }}
-#          {% elif ansible_os_family == 'RedHat' %}
-#          {{ dnf_updates.stdout | default('No pending updates') }}
-#          {% else %}
-#          No update info available for {{ ansible_os_family }}
-#          {% endif %}
-
-#          {{ C_BOLD }}{{ C_PURPLE }}--- RECENT FAILED SSH LOGINS ---{{ C_RESET }}
-#          {{ ssh_failed.stdout | default('None') }}
+          --- PENDING UPDATES ---
+          {% if ansible_os_family == 'Debian' %}
+          {{ apt_updates.stdout | default('No pending updates') }}
+          {% elif ansible_os_family == 'RedHat' %}
+          {{ dnf_updates.stdout | default('No pending updates') }}
+          {% else %}
+          No update info available for {{ ansible_os_family }}
+          {% endif %}
+          --- RECENT FAILED SSH LOGINS ---
+          {{ ssh_failed.stdout | default('None') }}
 
 
     # --- Fetch Reports Back to Controller ---
