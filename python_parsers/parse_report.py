@@ -1,9 +1,7 @@
 import pandas as pd
 import parse_storage_report
-import parse_services_report
-import parse_critical_logs
-import parse_ssh_report
-import parse_pending_report
+import parse_logs
+
 
 def parse_output(filename):
     """Splits a combined system report into storage and service sections."""
@@ -88,22 +86,22 @@ def parse_output(filename):
 
     # --- Send sections to sub-parsers ---
     storage_frames = [
-        parse_storage_report.parse(lines, host, date, uuid)
+        parse_logs.parse(lines, host, date, uuid)
         for lines, host, date, uuid in storage_sections
     ]
 
     service_frames = [
-        parse_services_report.parse(lines, host, date, uuid)
+        parse_logs.parse(lines, host, date, uuid)
         for lines, host, date, uuid in service_sections
     ]
 
     critical_frames = [
-        parse_critical_logs.parse(lines, host, date, uuid)
+        parse_logs.parse(lines, host, date, uuid)
         for lines, host, date, uuid in critical_sections
     ]
 
     ssh_frames = [
-        parse_ssh_report.parse(lines, host, date, uuid)
+        parse_logs.parse(lines, host, date, uuid)
         for lines, host, date, uuid in ssh_sections
     ]
 
