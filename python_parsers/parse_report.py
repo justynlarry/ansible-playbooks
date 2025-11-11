@@ -1,6 +1,7 @@
 import pandas as pd
 import parse_storage_report
 import parse_logs
+from datetime import date
 
 
 def parse_output(filename):
@@ -122,7 +123,8 @@ def parse_output(filename):
 # -------------------------------
 # Run parser and save outputs
 # -------------------------------
-log_path = "../system_reports/system_health.log"
+current_date = date.today()
+log_path = f"../system_reports/system_health['current_date'].log"
 df_storage, df_services, df_critical, df_ssh, df_pending = parse_output(log_path)
 
 file_date = "NO-Date"

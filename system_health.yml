@@ -127,7 +127,7 @@
     - name: Merge all individual reports into one file
       ansible.builtin.shell: |
         # Use the consistent local_date fact for file matching
-        cat {{ combined_report_dir }}/*/daily_report{{ local_date }}.log >> {{ combined_report_dir }}/system_health.log
+        cat {{ combined_report_dir }}/*/daily_report{{ local_date }}.log >> {{ combined_report_dir }}/system_health{{  local_date }}.log
         # Remove original individual reports and sub-directories
         find {{ combined_report_dir }} -type f -name "daily_report{{ local_date }}.log" -delete
         find {{ combined_report_dir }} -mindepth 1 -type d -empty -delete
@@ -137,7 +137,7 @@
 
     - name: Display Combined Report Summary Path
       ansible.builtin.debug:
-        msg: "Combined Daily report saved at: {{ combined_report_dir }}/system_health.log"
+        msg: "Combined Daily report saved at: {{ combined_report_dir }}/system_health{{ local_date }}.log"
 
 #    - name: Copy Combined Report to system_reports
 #      copy:
