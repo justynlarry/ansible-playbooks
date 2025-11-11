@@ -138,11 +138,11 @@ elif not df_pending.empty:
     file_date = df_pending["Date"].iloc[0]
 
 
-output_storage = f"disk_storage_output_{file_date}.txt"
-output_services = f"services_output_{file_date}.txt"
-output_critical = f"critical_output_{file_date}.txt"
-output_ssh = f"ssh_output_{file_date}.txt"
-output_pending = f"pending_output_{file_date}.txt"
+output_storage = f"reports/disk_storage_output_{file_date}.txt"
+output_services = f"reports/services_output_{file_date}.txt"
+output_critical = f"reports/critical_output_{file_date}.txt"
+output_ssh = f"reports/ssh_output_{file_date}.txt"
+output_pending = f"reports/pending_output_{file_date}.txt"
 
 if not df_storage.empty:
     df_storage.to_csv(output_storage, sep="\t", index=False)

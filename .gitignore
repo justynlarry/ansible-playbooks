@@ -3,6 +3,7 @@ host_vars/
 reports/
 system_reports/
 web_log/html/daily_logs/
+python_parsers/reports/
 
 *.swp
 
