@@ -1,4 +1,4 @@
-UUID	Hostname	Date	Service
+UUID	Hostname	Date	Critical Log
 4997cc22-7241-4db8-8071-e36b88effa84	ubred	2025-11-10	No pending updates
 4450e93d-545a-4844-9e34-70acad05dcb2	ubred2	2025-11-10	No pending updates
 778a86f2-a80f-457a-9376-b31a2bfb4949	sys-monitor	2025-11-10	No pending updates

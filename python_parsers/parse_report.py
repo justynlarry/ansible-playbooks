@@ -86,7 +86,7 @@ def parse_output(filename):
 
     # --- Send sections to sub-parsers ---
     storage_frames = [
-        parse_logs.parse(lines, host, date, uuid)
+        parse_storage_report.parse(lines, host, date, uuid)
         for lines, host, date, uuid in storage_sections
     ]
 
@@ -106,7 +106,7 @@ def parse_output(filename):
     ]
 
     pending_frames = [
-        parse_pending_report.parse(lines, host, date, uuid)
+        parse_logs.parse(lines, host, date, uuid)
         for lines, host, date, uuid in pending_sections
     ]
 
