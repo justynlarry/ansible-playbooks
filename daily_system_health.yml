@@ -52,6 +52,14 @@
       register: ssh_failed
       changed_when: false
 
+    # --- Detailed System Log Output ---
+    - name: Create Daily System Report
+      ansible.builtin.shell: |
+        sudo journalctl --priority 4 --output=verbose --no-pager --since today
+      register: critical_logs_today
+      changed_when: false
+
+
     # --- Write to Log File ---
 
     - name: Create Daily System Report
@@ -69,6 +77,7 @@
           {% set C_CYAN = '\033[36m' %}
           {% set C_BOLD = '\033[1m' %}
           {% set C_RESET = '\033[0m' %}
+
 
           {{ C_BOLD }}{{ C_GREEN }}============== DAILY SYSTEM HEALTH REPORT ======================
           Host:        {{ ansible_hostname }}
@@ -108,6 +117,8 @@
           {{ C_BOLD }}{{ C_PURPLE }}--- RECENT FAILED SSH LOGINS ---{{ C_RESET }}
           {{ ssh_failed.stdout | default('None') }}
 
+          {{ C_BOLD }}{{ C_RED }}--- CRITICAL LOGS BY PRIORITY ---{{ C_RESET }}
+          {{ critical_logs_today.stdout | default('No logs 0-4') }}
 
     # --- Fetch Reports Back to Controller ---
 

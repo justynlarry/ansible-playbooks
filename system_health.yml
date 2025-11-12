@@ -65,6 +65,8 @@
         group: root
         mode: '0644'
         content: |
+
+
           --- Host: {{ ansible_hostname }}
           --- Date: {{ ansible_date_time.date }}
           --- UUID: {{ ansible_product_uuid }}
