@@ -90,9 +90,12 @@
           {% else %}
           No update info available for {{ ansible_os_family }}
           {% endif %}
+
           --- RECENT FAILED SSH LOGINS ---
           {{ ssh_failed.stdout | default('None') }}
 
+          --- CRITICAL LOGS BY PRIORITY ---
+          {{ critical_logs_today.stdout | default('No logs 0-4') }}
 
     # --- Fetch Reports Back to Controller ---
 
