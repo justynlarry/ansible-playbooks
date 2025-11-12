@@ -52,7 +52,7 @@
 
     - name: Detailed System Log Output
       ansible.builtin.shell: |
-        sudo journalctl --priority 4 --no-pager --since today
+        sudo journalctl --priority 4 --output=verbose --no-pager --since today
       register: critical_logs_today
       changed_when: false
 
