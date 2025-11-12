@@ -1,5 +1,7 @@
 ---
 
+## Outputs system_health_<date>.log for use with parse_report.py
+
 - name: Daily System Health Report for Python Export
   hosts: all
   become: yes
@@ -44,6 +46,14 @@
     - name: Check Recent Failed SSH Logins
       ansible.builtin.shell: journalctl -u ssh -p 4 --since "24 hours ago" --no-pager || true
       register: ssh_failed
+      changed_when: false
+
+    # --- Detailed Log Checks
+
+    - name: Detailed System Log Output
+      ansible.builtin.shell: |
+        sudo journalctl --priority 4 --no-pager --since today
+      register: critical_logs_today
       changed_when: false
 
     # --- Write to Log File ---
@@ -127,7 +137,7 @@
     - name: Merge all individual reports into one file
       ansible.builtin.shell: |
         # Use the consistent local_date fact for file matching
-        cat {{ combined_report_dir }}/*/daily_report{{ local_date }}.log >> {{ combined_report_dir }}/system_health{{  local_date }}.log
+        cat {{ combined_report_dir }}/*/daily_report{{ local_date }}.log >> {{ combined_report_dir }}/system_health_{{  local_date }}.log
         # Remove original individual reports and sub-directories
         find {{ combined_report_dir }} -type f -name "daily_report{{ local_date }}.log" -delete
         find {{ combined_report_dir }} -mindepth 1 -type d -empty -delete
@@ -137,7 +147,7 @@
 
     - name: Display Combined Report Summary Path
       ansible.builtin.debug:
-        msg: "Combined Daily report saved at: {{ combined_report_dir }}/system_health{{ local_date }}.log"
+        msg: "Combined Daily report saved at: {{ combined_report_dir }}/system_health_{{ local_date }}.log"
 
 #    - name: Copy Combined Report to system_reports
 #      copy:
