@@ -125,6 +125,7 @@
     combined_report_dir: "./system_reports"
     # Keep combined_report_file here, we will replace the lookup later
     combined_report_file: "{{ combined_report_dir }}/system_health_FIXME.log" # Placeholder
+    remote_report_dir: "/home/sm-user/vm_system_reports/"
 
   tasks:
     # --- STEP 1: Define a consistent local date variable ---
@@ -150,9 +151,40 @@
         executable: /bin/bash
       ignore_errors: yes
 
+    # --- STEP 4: Display the combined report path ---
+
     - name: Display Combined Report Summary Path
       ansible.builtin.debug:
         msg: "Combined Daily report saved at: {{ combined_report_dir }}/system_health_{{ local_date }}.log"
+
+    # --- STEP 5: Copy the final report to remote host ---
+
+- name: Copy combined report to archive server
+  hosts: report_archive_servers
+  become: true
+  gather_facts: false
+  vars:
+    local_report: "./system_reports/system_health_{{ lookup('pipe', 'date +%F') }}.log"
+    remote_report_dir: "/home/sm-user/vm_system_reports"
+
+  tasks:
+    - name: Ensure remote report directory exists
+      ansible.builtin.file:
+        path: "{{ remote_report_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Copy combined report from localhost to archive host
+      ansible.builtin.copy:
+        src: "{{ local_report }}"
+        dest: "{{ remote_report_dir }}/vm_system_report_{{ lookup('pipe', 'date +%F') }}.log"
+        owner: sm-user
+        group: sm-user
+        mode: '0644'
+      delegate_to: localhost
+
 
 #    - name: Copy Combined Report to system_reports
 #      copy:
