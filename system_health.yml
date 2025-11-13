@@ -34,13 +34,6 @@
       ansible.builtin.shell: systemctl --failed --no-pager || true
       register: failed_services
 
-    # --- Log Checks ---
-
-    - name: Get High-Priority Logs (errors and criticals)
-      ansible.builtin.command: journalctl -p 3 -xb --no-pager
-      register: log_critical
-      changed_when: false
-
     # --- Optional Security & SSH Review ---
 
     - name: Check Recent Failed SSH Logins
@@ -70,34 +63,21 @@
           --- Host: {{ ansible_hostname }}
           --- Date: {{ ansible_date_time.date }}
           --- UUID: {{ ansible_product_uuid }}
+          ===BEGIN:STORAGE===
           {{ disk_info.stdout | default('N/A') }}
+          ===END:STORAGE===
 
-
-          --- FAILED SERVICES ---
+          ===BEGIN:FAILED_SERVICES===
           {{ failed_services.stdout | default('None detected') }}
+          ===END:FAILED_SERVICES===
 
-          {% set log_content = log_critical.stdout | default('-- No entries --') | trim %}
-          --- CRITICAL LOGS (journalctl -p 3) ---
-          {% if log_content != '-- No entries --' %}
-          {{ log_content }}
-          {% else %}
-          {{ log_content }}
-          {% endif %}
-
-          --- PENDING UPDATES ---
-          {% if ansible_os_family == 'Debian' %}
-          {{ apt_updates.stdout | default('No pending updates') }}
-          {% elif ansible_os_family == 'RedHat' %}
-          {{ dnf_updates.stdout | default('No pending updates') }}
-          {% else %}
-          No update info available for {{ ansible_os_family }}
-          {% endif %}
-
-          --- RECENT FAILED SSH LOGINS ---
+          ===BEGIN:FAILED_SSH===
           {{ ssh_failed.stdout | default('None') }}
+          ===END:FAILED_SSH===
 
-          --- CRITICAL LOGS BY PRIORITY ---
+          ===BEGIN:CRITICAL_LOGS_PRIORITY===
           {{ critical_logs_today.stdout | default('No logs 0-4') }}
+          ===END:CRITICAL_LOGS_PRIORITY===
 
     # --- Fetch Reports Back to Controller ---
 
