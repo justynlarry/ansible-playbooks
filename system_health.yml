@@ -161,28 +161,28 @@
 
 - name: Copy combined report to archive server
   hosts: report_archive_servers
-  become: true
+#  become: true
   gather_facts: false
   vars:
     local_report: "./system_reports/system_health_{{ lookup('pipe', 'date +%F') }}.log"
     remote_report_dir: "/home/sm-user/vm_system_reports"
 
   tasks:
-    - name: Ensure remote report directory exists
-      ansible.builtin.file:
-        path: "{{ remote_report_dir }}"
-        state: directory
-        owner: root
-        group: root
-        mode: '0755'
+#    - name: Ensure remote report directory exists
+#      ansible.builtin.file:
+#        path: "{{ remote_report_dir }}"
+#        state: directory
+#        owner: ansbl-user
+#        group: ansbl-user
+#        mode: '0755'
 
     - name: Copy combined report from localhost to archive host
       ansible.builtin.copy:
         src: "{{ local_report }}"
         dest: "{{ remote_report_dir }}/vm_system_report_{{ lookup('pipe', 'date +%F') }}.log"
-        owner: sm-user
-        group: sm-user
-        mode: '0644'
+        owner: ansbl-user
+        group: ansbl-user
+        mode: '0755'
       delegate_to: localhost
 
 
