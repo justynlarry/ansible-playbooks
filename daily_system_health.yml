@@ -55,7 +55,7 @@
     # --- Detailed System Log Output ---
     - name: Create Daily System Report
       ansible.builtin.shell: |
-        sudo journalctl --priority 4 --output=verbose --no-pager --since today
+        sudo journalctl --priority 3 --output=verbose --no-pager --since today
       register: critical_logs_today
       changed_when: false
 
