@@ -1,0 +1,53 @@
+[all:vars]
+ansible_user=ansbl-user
+ansible_ssh_private_key_file=~/.ssh/ansible
+ansible_python_interpreter=/usr/bin/python3
+
+#[db-servers:vars]
+#ansible_user=docker-user
+#ansible_ssh_private_key_file=~/.ssh/docker_user_key
+
+
+[web-servers]
+# debRed
+192.168.0.132 server_alias='debRed'
+# mtg-webserver
+192.168.0.120 server_alias='mtg-webserver'
+# heimdall
+192.168.0.137 server_alias='heimdall'
+
+[file-servers]
+# ubRed
+192.168.0.107 server_alias='ubred'
+# shire
+192.168.0.195 server_alias='shire'
+# file-server
+192.168.0.121 server_alias='file-server'
+
+[system-monitors]
+# ubRed2
+192.168.0.108  server_alias='ubRed2'
+# sys-monitor
+192.168.0.11 server_alias='sys-monitor'
+# mandalore
+192.168.0.168 server_alias='mandalore'
+
+[db-servers]
+# db-svr1
+192.168.0.172 server_alias='db-svr01'
+# db-svr2
+192.168.0.12 server_alias='db-svr02'
+
+[dev-servers]
+# dev-svr
+192.168.0.8 server_alias='dev-svr'
+# dev-svr02
+192.168.0.184 server_alias='dev-svr02'
+# dev-svr03
+192.168.0.74 server_alias='dev-svr03'
+
+[report_archive_servers]
+# sys-monitor
+192.168.0.11 server_alias='sys-monitor'
+
+[test]
