@@ -1,0 +1,104 @@
+---
+# Bootstrap playbook to establish SSH trust for Jenkins automation
+# Run this manually ONCE as the user who has initial access to the hosts
+# Example: ansible-playbook -i inventories/production.ini bootstrap_ssh.yml --ask-pass --ask-become-pass
+
+- name: Bootstrap SSH Keys and Known Hosts for Jenkins
+  hosts: all
+  gather_facts: no
+  
+  vars:
+    jenkins_user: jenkins
+    jenkins_home: /var/lib/jenkins
+    jenkins_ssh_key_path: "{{ jenkins_home }}/.ssh/ansible"
+    local_ssh_key_path: ~/.ssh/ansible  # Where your current key is
+    
+  tasks:
+    # First, ensure we can connect with current credentials
+    - name: Test initial connectivity
+      ansible.builtin.ping:
+      
+    # Copy the SSH public key to target hosts for the ansible user
+    - name: Ensure ansbl-user .ssh directory exists
+      ansible.builtin.file:
+        path: /home/ansbl-user/.ssh
+        state: directory
+        owner: ansbl-user
+        group: ansbl-user
+        mode: '0700'
+      become: yes
+      
+    - name: Deploy SSH public key for ansbl-user
+      ansible.posix.authorized_key:
+        user: ansbl-user
+        key: "{{ lookup('file', local_ssh_key_path + '.pub') }}"
+        state: present
+      become: yes
+
+# Now configure Jenkins controller to trust all hosts
+- name: Configure Jenkins SSH Environment
+  hosts: localhost
+  gather_facts: no
+  become: yes
+  become_method: sudo
+  
+  vars:
+    jenkins_user: jenkins
+    jenkins_home: /var/lib/jenkins
+    jenkins_ssh_dir: "{{ jenkins_home }}/.ssh"
+    local_ssh_key_path: ~/.ssh/ansible
+    
+  tasks:
+    - name: Ensure Jenkins .ssh directory exists
+      ansible.builtin.file:
+        path: "{{ jenkins_ssh_dir }}"
+        state: directory
+        owner: "{{ jenkins_user }}"
+        group: "{{ jenkins_user }}"
+        mode: '0700'
+        
+    - name: Copy SSH private key to Jenkins
+      ansible.builtin.copy:
+        src: "{{ local_ssh_key_path }}"
+        dest: "{{ jenkins_ssh_dir }}/ansible"
+        owner: "{{ jenkins_user }}"
+        group: "{{ jenkins_user }}"
+        mode: '0600'
+        
+    - name: Copy SSH public key to Jenkins
+      ansible.builtin.copy:
+        src: "{{ local_ssh_key_path }}.pub"
+        dest: "{{ jenkins_ssh_dir }}/ansible.pub"
+        owner: "{{ jenkins_user }}"
+        group: "{{ jenkins_user }}"
+        mode: '0644'
+        
+    - name: Create temporary known_hosts file
+      ansible.builtin.tempfile:
+        state: file
+        suffix: _known_hosts
+      register: temp_known_hosts
+      
+    - name: Scan and add all hosts to temporary known_hosts
+      ansible.builtin.shell: |
+        ssh-keyscan -H {{ item.value.ansible_host }} >> {{ temp_known_hosts.path }}
+      loop: "{{ groups['all'] | map('extract', hostvars) | list }}"
+      when: item.value.ansible_host is defined
+      
+    - name: Remove duplicate entries from temporary file
+      ansible.builtin.shell: |
+        sort -u {{ temp_known_hosts.path }} -o {{ temp_known_hosts.path }}
+        
+    - name: Copy known_hosts to Jenkins directory
+      ansible.builtin.copy:
+        src: "{{ temp_known_hosts.path }}"
+        dest: "{{ jenkins_ssh_dir }}/known_hosts"
+        owner: "{{ jenkins_user }}"
+        group: "{{ jenkins_user }}"
+        mode: '0644'
+        remote_src: yes
+        
+    - name: Remove temporary file
+      ansible.builtin.file:
+        path: "{{ temp_known_hosts.path }}"
+        state: absent
