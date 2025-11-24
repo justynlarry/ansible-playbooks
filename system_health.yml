@@ -86,14 +86,14 @@
       run_once: true
       become: false
       ansible.builtin.file:
-        path: "./system_reports"
+        path: "/tmp/system_reports"
         state: directory
-        mode: '0755'
+        mode: '0777'
 
     - name: Fetch Report From Each Host to Controller
       ansible.builtin.fetch:
         src: "{{ report_file }}"
-        dest: "./system_reports/"
+        dest: "/tmp/system_reports/"
         flat: no
 
     # --- Combine all Reports into one File (local only) ---
@@ -102,7 +102,7 @@
   hosts: localhost
   gather_facts: false
   vars:
-    combined_report_dir: "./system_reports"
+    combined_report_dir: "/tmp/system_reports"
     # Keep combined_report_file here, we will replace the lookup later
     combined_report_file: "{{ combined_report_dir }}/system_health_FIXME.log" # Placeholder
     remote_report_dir: "/home/sm-user/vm_system_reports/"
@@ -144,7 +144,7 @@
   become: true
   gather_facts: false
   vars:
-    local_report: "./system_reports/system_health_{{ lookup('pipe', 'date +%F') }}.log"
+    local_report: "/tmp/system_reports/system_health_{{ lookup('pipe', 'date +%F') }}.log"
     remote_report_dir: "/home/sm-user/vm_system_reports"
 
   tasks:
