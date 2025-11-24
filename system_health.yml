@@ -6,9 +6,11 @@
   hosts: all
   become: yes
   gather_facts: yes
+  ignore_unreachable: yes
+  any_errors_fatal: no
 
   vars:
-    report_dir: .
+    report_dir: /tmp
     report_file: "{{ report_dir }}/daily_report{{ ansible_date_time.date }}.log"
 
   tasks:
@@ -19,6 +21,7 @@
         owner: root
         group: root
         mode: '0755'
+      when: ansible_hostname is defined
 
     # --- Disk Usage  ---
 
@@ -101,6 +104,7 @@
 - name: Combine all fetched reports into one master file
   hosts: localhost
   gather_facts: false
+  ignore_unreachable: yes
   vars:
     combined_report_dir: "/tmp/system_reports"
     # Keep combined_report_file here, we will replace the lookup later
@@ -143,6 +147,7 @@
   hosts: report_archive_servers
   become: true
   gather_facts: false
+  ignore_unreachable: yes
   vars:
     local_report: "/tmp/system_reports/system_health_{{ lookup('pipe', 'date +%F') }}.log"
     remote_report_dir: "/home/sm-user/vm_system_reports"
@@ -162,4 +167,4 @@
         dest: "{{ remote_report_dir }}/vm_system_report_{{ lookup('pipe', 'date +%F') }}.log"
         owner: sm-user
         group: sm-user
-        mode: '0644'
+        mode: '0770'
