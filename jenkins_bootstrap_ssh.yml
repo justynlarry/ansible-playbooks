@@ -73,6 +73,10 @@
         group: "{{ jenkins_user }}"
         mode: '0644'
         
+    - name: Build list of all host IPs
+      ansible.builtin.set_fact:
+        all_host_ips: "{{ groups['all'] | map('extract', hostvars, 'ansible_host') | list }}"
+    
     - name: Create temporary known_hosts file
       ansible.builtin.tempfile:
         state: file
@@ -81,9 +85,9 @@
       
     - name: Scan and add all hosts to temporary known_hosts
       ansible.builtin.shell: |
-        ssh-keyscan -H {{ item.value.ansible_host }} >> {{ temp_known_hosts.path }}
-      loop: "{{ groups['all'] | map('extract', hostvars) | list }}"
-      when: item.value.ansible_host is defined
+        ssh-keyscan -H {{ all_host_ips | join(' ') }} >> {{ temp_known_hosts.path }}
+      args:
+        executable: /bin/bash
       
     - name: Remove duplicate entries from temporary file
       ansible.builtin.shell: |
