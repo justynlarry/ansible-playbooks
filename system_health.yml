@@ -21,7 +21,7 @@
         owner: root
         group: root
         mode: '0755'
-      when: ansible_hostname is defined
+      when: ansible_hostname is defined and ansible_date_time is defined and ansible_product_uuid is defined
 
     # --- Disk Usage  ---
 
@@ -30,12 +30,14 @@
         df -h |
         grep -Ev 'tmpfs|udev|/run|/dev/shm|/run/user|overlay'
       register: disk_info
+      when: ansible_hostname is defined and ansible_date_time is defined and ansible_product_uuid is defined
 
     # --- Systemd Service Check ---- 
 
     - name: Check for Failed Systemd Services
       ansible.builtin.shell: systemctl --failed --no-pager || true
       register: failed_services
+      when: ansible_hostname is defined and ansible_date_time is defined and ansible_product_uuid is defined
 
     # --- Optional Security & SSH Review ---
 
@@ -43,6 +45,7 @@
       ansible.builtin.shell: journalctl -u ssh -p 4 --since "24 hours ago" --no-pager || true
       register: ssh_failed
       changed_when: false
+      when: ansible_hostname is defined and ansible_date_time is defined and ansible_product_uuid is defined
 
     # --- Detailed Log Checks
 
@@ -51,6 +54,7 @@
         sudo journalctl --priority 3 --output=verbose --no-pager --since today
       register: critical_logs_today
       changed_when: false
+      when: ansible_hostname is defined and ansible_date_time is defined and ansible_product_uuid is defined
 
     # --- Write to Log File ---
 
@@ -81,6 +85,7 @@
           ===BEGIN:CRITICAL_LOGS_PRIORITY===
           {{ critical_logs_today.stdout | default('No logs 0-3') }}
           ===END:CRITICAL_LOGS_PRIORITY===
+      when: ansible_hostname is defined and ansible_date_time is defined and ansible_product_uuid is defined
 
     # --- Fetch Reports Back to Controller ---
 
@@ -92,12 +97,14 @@
         path: "/tmp/system_reports"
         state: directory
         mode: '0777'
+      when: ansible_date_time is defined
 
     - name: Fetch Report From Each Host to Controller
       ansible.builtin.fetch:
         src: "{{ report_file }}"
         dest: "/tmp/system_reports/"
         flat: no
+      when: ansible_date_time is defined
 
     # --- Combine all Reports into one File (local only) ---
 
@@ -105,6 +112,8 @@
   hosts: localhost
   gather_facts: false
   ignore_unreachable: yes
+
+
   vars:
     combined_report_dir: "/tmp/system_reports"
     # Keep combined_report_file here, we will replace the lookup later
