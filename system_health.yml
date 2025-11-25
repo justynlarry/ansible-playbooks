@@ -10,8 +10,8 @@
   any_errors_fatal: no
 
   vars:
-    report_dir: /tmp
-    report_file: "{{ report_dir }}/daily_report{{ ansible_date_time.date }}.log"
+    report_dir: /tmp/system_reports
+    report_file: "{{ report_dir }}/system_health_{{ ansible_date_time.date }}_{{ ansible_hostname }}.log"
 
   tasks:
     - name: Ensure report directory exists
@@ -103,7 +103,7 @@
       ansible.builtin.fetch:
         src: "{{ report_file }}"
         dest: "/tmp/system_reports/"
-        flat: no
+        flat: yes
       when: ansible_date_time is defined
 
     # --- Combine all Reports into one File (local only) ---
@@ -136,7 +136,7 @@
     - name: Merge all individual reports into one file
       ansible.builtin.shell: |
         # Use the consistent local_date fact for file matching
-        cat {{ combined_report_dir }}/*/daily_report{{ local_date }}.log >> {{ combined_report_dir }}/system_health_{{  local_date }}.log
+        cat {{ combined_report_dir }}/system_health_{{ local_date }}_*.log >> {{ combined_report_dir }}/system_health_{{  local_date }}.log
         # Remove original individual reports and sub-directories
         find {{ combined_report_dir }} -type f -name "daily_report{{ local_date }}.log" -delete
         find {{ combined_report_dir }} -mindepth 1 -type d -empty -delete
