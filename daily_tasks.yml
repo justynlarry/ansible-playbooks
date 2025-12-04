@@ -38,7 +38,7 @@
 
     - name: Create a file with hostname and logs on Ansible Control Node
       ansible.builtin.copy:
-        dest:  "/tmp/problem_logs_report_{{ current_datetime }}_{{ inventory_hostname }}.tmp"
+        dest:  "/home/blue-user/ansible-reports/problem_logs_report_{{ current_datetime }}_{{ inventory_hostname }}.tmp"
         content: |
           ==================================================
           HOST:     {{ ansible_hostname }}
@@ -50,10 +50,18 @@
       delegate_to: localhost
       become: false
 
+    - name: Remove old final reports if they exist
+      ansible.builtin.file:
+        path: "/home/blue-user/ansible-reports/final_problem_logs_report_{{ current_datetime }}.txt"
+        state: absent
+      delegate_to: localhost
+      run_once: true
+      become: false
+
     - name: Assemble all temporary log files into a final report
       ansible.builtin.assemble:
-        src: "/tmp/"
-        dest: "/tmp/final_problem_logs_report_{{ current_datetime }}.txt"
+        src: "/home/blue-user/ansible-reports/"
+        dest: "/home/blue-user/ansible-reports/final_problem_logs_report_{{ current_datetime }}.txt"
         regexp: 'problem_logs_report_{{ current_datetime}}_.*\.tmp$'
         remote_src: true
       delegate_to: localhost
