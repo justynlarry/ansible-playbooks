@@ -70,7 +70,7 @@
 
     - name: Clean up temporary files
       ansible.builtin.file:
-        path: "/tmp/problem_logs_report_{{ current_datetime }}_{{ inventory_hostname }}.tmp"
+        path: "/home/blue-user/ansible-reports/problem_logs_report_{{ current_datetime }}_{{ inventory_hostname }}.tmp"
         state: absent
       delegate_to: localhost
       become: false
