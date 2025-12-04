@@ -76,3 +76,17 @@
       ansible.builtin.debug:
         msg: "\u001b[1;31m REBOOT REQUIRED: The file /var/run/reboot-required exists.\u001b[0m"
       when: reboot_required_file.stat.exists
+
+    - name: Create reboot notification file for Jenkins
+      ansible.builtin.copy:
+        content: |
+          The following hosts require a reboot:
+          {% for host in ansible_play_hosts %}
+          {% if hostvars[host].reboot_required_file.stat.exists %}
+            - {{ hostvars[host].ansible_hostname }} ({{ host }})
+          {% endfor %}
+        dest: "/tmp/reboot_notification_{{ current_datetime }}.txt"
+      delegate_to: localhost
+      run_once: true
+      become: false
+      when: ansible_play_hosts | map('extract', hostvars) | selectattr('reboot_required_file.stat.exists') | list | length >0
