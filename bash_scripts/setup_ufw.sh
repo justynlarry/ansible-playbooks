@@ -35,23 +35,30 @@ echo ""
 echo "🔍 Detected Services & Adding Rules:"
 echo ""
 
-# Always allow SSH (critical!)
-SSH_PORT=$(grep "^Port" /etc/ssh/sshd_config 2>/dev/null | awk '{print $2}' || echo "22")
+# Always allow SSH (critical!) - FIXED PORT DETECTION
+if [ -f /etc/ssh/sshd_config ]; then
+    SSH_PORT=$(grep "^Port " /etc/ssh/sshd_config 2>/dev/null | awk '{print $2}')
+fi
+
+# If no custom port found, default to 22
+if [ -z "$SSH_PORT" ]; then
+    SSH_PORT="22"
+fi
+
 echo "  ✅ SSH on port $SSH_PORT"
-ufw allow $SSH_PORT/tcp comment 'SSH'
+ufw allow ${SSH_PORT}/tcp comment 'SSH'
 
 # Detect and allow Prometheus Node Exporter
 if systemctl is-active --quiet prometheus-node-exporter 2>/dev/null || pgrep node_exporter &>/dev/null; then
     echo "  ✅ Prometheus Node Exporter (9100)"
-    # Get monitoring server IP from environment or use common subnets
-    MONITOR_IP="${PROMETHEUS_SERVER:-192.168.0.0/24}"
-    ufw allow from $MONITOR_IP to any port 9100 proto tcp comment 'Prometheus Node Exporter'
+    # Allow from local networks
+    ufw allow from 192.168.0.0/16 to any port 9100 proto tcp comment 'Prometheus Node Exporter'
+    ufw allow from 10.0.0.0/8 to any port 9100 proto tcp comment 'Prometheus Node Exporter'
 fi
 
 # Detect and allow MySQL/MariaDB
 if systemctl is-active --quiet mysql 2>/dev/null || systemctl is-active --quiet mariadb 2>/dev/null; then
     echo "  ✅ MySQL/MariaDB (3306)"
-    # Allow from local network only
     ufw allow from 192.168.0.0/16 to any port 3306 proto tcp comment 'MySQL'
     ufw allow from 10.0.0.0/8 to any port 3306 proto tcp comment 'MySQL'
 fi
@@ -64,8 +71,8 @@ if systemctl is-active --quiet postgresql 2>/dev/null; then
 fi
 
 # Detect and allow Samba
-if systemctl is-active --quiet smbd 2>/dev/null; then
-    echo "  ✅ Samba (139, 445)"
+if systemctl is-active --quiet smbd 2>/dev/null || systemctl is-active --quiet nmbd 2>/dev/null; then
+    echo "  ✅ Samba (139, 445, 137, 138)"
     ufw allow from 192.168.0.0/16 to any port 139,445 proto tcp comment 'Samba'
     ufw allow from 10.0.0.0/8 to any port 139,445 proto tcp comment 'Samba'
     ufw allow from 192.168.0.0/16 to any port 137,138 proto udp comment 'Samba NetBIOS'
@@ -74,10 +81,13 @@ fi
 
 # Detect and allow Jenkins
 if systemctl is-active --quiet jenkins 2>/dev/null; then
-    JENKINS_PORT=$(grep "HTTP_PORT=" /etc/default/jenkins 2>/dev/null | cut -d= -f2 || echo "8080")
+    JENKINS_PORT="8080"
+    if [ -f /etc/default/jenkins ]; then
+        JENKINS_PORT=$(grep "HTTP_PORT=" /etc/default/jenkins 2>/dev/null | cut -d= -f2 || echo "8080")
+    fi
     echo "  ✅ Jenkins ($JENKINS_PORT)"
-    ufw allow from 192.168.0.0/16 to any port $JENKINS_PORT proto tcp comment 'Jenkins'
-    ufw allow from 10.0.0.0/8 to any port $JENKINS_PORT proto tcp comment 'Jenkins'
+    ufw allow from 192.168.0.0/16 to any port ${JENKINS_PORT}/tcp comment 'Jenkins'
+    ufw allow from 10.0.0.0/8 to any port ${JENKINS_PORT}/tcp comment 'Jenkins'
 fi
 
 # Detect and allow Prometheus Server
@@ -104,13 +114,21 @@ fi
 # Detect and allow Docker
 if systemctl is-active --quiet docker 2>/dev/null; then
     echo "  ⚠️  Docker detected - allowing docker0 interface"
-    ufw allow in on docker0
+    ufw allow in on docker0 2>/dev/null || true
 fi
 
 # Allow Tailscale
-if command -v tailscale &> /dev/null; then
+if command -v tailscale &> /dev/null && tailscale status &>/dev/null; then
     echo "  ✅ Tailscale detected"
-    ufw allow in on tailscale0
+    ufw allow in on tailscale0 2>/dev/null || true
+fi
+
+# Allow Proxmox cluster communication (if this is a Proxmox node)
+if [ -f /etc/pve/.version ]; then
+    echo "  ✅ Proxmox node detected"
+    ufw allow from 192.168.0.0/16 to any port 8006 proto tcp comment 'Proxmox Web UI'
+    ufw allow from 192.168.0.0/16 to any port 5900:5999 proto tcp comment 'Proxmox VNC'
+    ufw allow from 192.168.0.0/16 to any port 3128 proto tcp comment 'Proxmox Spice Proxy'
 fi
 
 echo ""

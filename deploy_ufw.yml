@@ -1,0 +1,23 @@
+---
+- name: Deploy and configure UFW on all servers
+  hosts: all
+  become: yes
+  tasks:
+    - name: Copy UFW setup script
+      copy:
+        src: /home/blue-user/ansible-playbooks/bash_scripts/setup_ufw.sh
+        dest: /tmp/setup_ufw.sh
+        mode: '0755'
+
+    - name: Run UFW setup script
+      shell: /tmp/setup_ufw.sh
+      register: ufw_output
+
+    - name: Display UFW configuration result
+      debug:
+        var: ufw_output.stdout_lines
+
+    - name: Clean up script
+      file:
+        path: /tmp/setup_ufw.sh
+        state: absent
