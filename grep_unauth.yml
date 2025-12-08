@@ -2,6 +2,7 @@
 
 - name: Discover Services On all Servers
   hosts: all
+  become: true
   gather_facts: yes
 
   tasks:
@@ -25,4 +26,4 @@
           - "Host: {{ inventory_hostname }}"
           - "IP: {{ ansible_default_ipv4.address }}"
           - "Susp. Logins:  {{ suspicious_logins.stdout | default('None Found') }}"
-          - "Log History-Passwords: {{ password_accepted }}"
+          - "Log History-Passwords: {{ password_accepted.stdout }}"
