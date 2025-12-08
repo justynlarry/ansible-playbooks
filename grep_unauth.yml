@@ -20,6 +20,13 @@
       failed_when: false
       ignore_errors: true
 
+    - name: Search Log History for Accepted Public Key
+      shell: sudo grep "Accepted publickey" /var/log/auth.log | grep -E "45\.159\.98\.145|45\.159\.97\.233|5\.161\.218\.233"
+      register: public_key
+      changed_when: false
+      failed_when: false
+      ignore_errors: true
+
     - name: Display Results
       debug:
         msg:
@@ -27,3 +34,4 @@
           - "IP: {{ ansible_default_ipv4.address }}"
           - "Susp. Logins:  {{ suspicious_logins.stdout | default('None Found') }}"
           - "Log History-Passwords: {{ password_accepted.stdout }}"
+          - "Accepted Public Key: {{ public_key.stdout }}"
