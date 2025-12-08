@@ -1,0 +1,17 @@
+---
+
+- name: Discover Services On all Servers
+  hosts: all
+  gather_facts: yes
+  tasks:
+    - name: Get Listening Ports
+      shell: ss -tulpn | grep LISTEN
+      register: listening_ports
+      changed_when: false
+
+    - name: Display Hostname and Ports
+      debug:
+        msg:
+          - "Host: {{ inventory_hostname }}\n"
+          - "IP: {{ ansible_default_ipv4.address }}\n"
+          - "Listening Ports: {{ listening_ports.stdout_lines }}\n"
