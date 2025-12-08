@@ -1,0 +1,28 @@
+---
+
+- name: Discover Services On all Servers
+  hosts: all
+  gather_facts: yes
+
+  tasks:
+    - name: Search login history for suspicious IPs
+      shell: last | grep -E "45\.159\.98|45\.159\.97|5\.161\.218"
+      register: suspicious_logins
+      changed_when: false
+      failed_when: false
+      ignore_errors: true
+
+    - name: Search Log History for suspicious IPs
+      shell: grep "Accepted password" /var/log/auth.log | grep -E "45\.159\.98\.145|45\.159\.97\.233|5\.161\.218\.233"
+      register: password_accepted
+      changed_when: false
+      failed_when: false
+      ignore_errors: true
+
+    - name: Display Results
+      debug:
+        msg:
+          - "Host: {{ inventory_hostname }}"
+          - "IP: {{ ansible_default_ipv4.address }}"
+          - "Susp. Logins:  {{ suspicious_logins.stdout | default('None Found') }}"
+          - "Log History-Passwords: {{ password_accepted }}"
