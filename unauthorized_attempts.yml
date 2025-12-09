@@ -1,0 +1,51 @@
+---
+
+- name: Detect unauthorized login attempts on all servers
+  hosts: all
+  become: true
+  gather_facts: yes
+
+  vars:
+    allowed_ips:
+      - "10.0.0.0/8"
+      - "192.168.0.0/16"
+      - "172.16.0.0/12"
+      - "100.64.0.0/10"       # Tailscale
+      - "{{ lookup('file', '/tmp/prod_hosts_to_exclude.txt', errors='ignore') | splitlines }}"
+
+  tasks:
+
+    - name: Gather recent SSH events (last 5000 lines)
+      shell: journalctl -u ssh --no-pager -n 5000
+      register: ssh_logs
+      changed_when: false
+
+    - name: Detect failed logins
+      set_fact:
+        failed_attempts: >-
+          {{ ssh_logs.stdout | regex_findall('Failed password.*from ([0-9\.]+)') }}
+
+    - name: Detect invalid user attempts
+      set_fact:
+        invalid_users: >-
+          {{ ssh_logs.stdout | regex_findall('Invalid user ([A-Za-z0-9_\-]+) from ([0-9\.]+)') }}
+
+    - name: Detect successful logins
+      set_fact:
+        accepted_attempts: >-
+          {{ ssh_logs.stdout | regex_findall('Accepted (?:password|publickey) for .* from ([0-9\.]+)') }}
+
+    - name: Filter successful logins from unknown IPs
+      set_fact:
+        suspicious_success: >-
+          {{ accepted_attempts |
+             reject('ipaddr', allowed_ips) |
+             list }}
+
+    - name: Display intrusion summary
+      debug:
+        msg:
+          - "Host: {{ inventory_hostname }}"
+          - "Failed login attempts: {{ failed_attempts | length }}"
+          - "Invalid user attempts: {{ invalid_users | length }}"
+          - "Suspicious successful logins: {{ suspicious_success }}"
