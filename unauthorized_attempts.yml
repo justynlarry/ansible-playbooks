@@ -1,9 +1,21 @@
 ---
 
+- name: Update authroized server list from production.ini
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  tasks:
+    - name: Extract IPs from production.ini
+      shell: /home/blue-user/ansible-playbooks/bash_scripts/inventory_extract.sh
+      changed_when: false
+
+
 - name: Detect unauthorized login attempts on all servers
   hosts: all
-  become: true
+  become: false
   gather_facts: yes
+  any_errors_fatal: no
   collections:
     - community.general
 
@@ -12,14 +24,10 @@
       - "10.0.0.0/8"
       - "192.168.0.0/16"
       - "172.16.0.0/12"
-#      - 127.0.01
+      - "127.0.01/8"
       - "100.64.0.0/10"     # Tailscale
 
   tasks:
-
-    - name: Update authorized server list from production.ini
-      shell: ./home/blue-user/ansible-playbooks/bash_scripts/inventory_extract.sh
-
 
     - name: Load additional allowed IPs from file (if exists)
       set_fact:
