@@ -4,14 +4,21 @@
   hosts: all
   become: true
   gather_facts: yes
+  collections:
+    - community.general
+    - ansible.netcommon
 
   vars:
     allowed_ips:
-      - "10.0.0.0/8"
-      - "192.168.0.0/16"
-      - "172.16.0.0/12"
-      - "100.64.0.0/10"       # Tailscale
-      - "{{ lookup('file', '/tmp/prod_hosts_to_exclude.txt', errors='ignore') | splitlines }}"
+      {{
+        [
+          "10.0.0.0/8",
+          "192.168.0.0/16",
+          "172.16.0.0/12",
+          "100.64.0.0/10"
+        ]
+        + (lookup('file', '/tmp/prod_hosts_to_exclude.txt', errors='ignore') | splitlines)
+      }}
 
   tasks:
 
@@ -38,9 +45,7 @@
     - name: Filter successful logins from unknown IPs
       set_fact:
         suspicious_success: >-
-          {{ accepted_attempts |
-             reject('ipaddr', allowed_ips) |
-             list }}
+          {{ accepted_attempts | reject('ipaddr', allowed_ips) | list }}
 
     - name: Display intrusion summary
       debug:
