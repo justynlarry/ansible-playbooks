@@ -6,21 +6,29 @@
   gather_facts: yes
   collections:
     - community.general
-    - ansible.netcommon
 
   vars:
-    allowed_ips:
-      {{
-        [
-          "10.0.0.0/8",
-          "192.168.0.0/16",
-          "172.16.0.0/12",
-          "100.64.0.0/10"
-        ]
-        + (lookup('file', '/tmp/prod_hosts_to_exclude.txt', errors='ignore') | splitlines)
-      }}
+    base_allowed_ips:
+      - "10.0.0.0/8"
+      - "192.168.0.0/16"
+      - "172.16.0.0/12"
+#      - 127.0.01
+      - "100.64.0.0/10"     # Tailscale
 
   tasks:
+
+    - name: Update authorized server list from production.ini
+      shell: ./home/blue-user/ansible-playbooks/bash_scripts/inventory_extract.sh
+
+
+    - name: Load additional allowed IPs from file (if exists)
+      set_fact:
+        extra_allowed_ips: "{{ lookup('file', '/tmp/prod_hosts_to_exclude.txt', errors='ignore').split('\n') | select() | list }}"
+      failed_when: false
+
+    - name: Combine base and extra allowed IPs
+      set_fact:
+        allowed_ips: "{{ base_allowed_ips + (extra_allowed_ips | default([])) }}"
 
     - name: Gather recent SSH events (last 5000 lines)
       shell: journalctl -u ssh --no-pager -n 5000
@@ -29,23 +37,45 @@
 
     - name: Detect failed logins
       set_fact:
-        failed_attempts: >-
-          {{ ssh_logs.stdout | regex_findall('Failed password.*from ([0-9\.]+)') }}
+        failed_attempts: "{{ ssh_logs.stdout | regex_findall('Failed password.*from ([0-9\\.]+)') }}"
 
     - name: Detect invalid user attempts
       set_fact:
-        invalid_users: >-
-          {{ ssh_logs.stdout | regex_findall('Invalid user ([A-Za-z0-9_\-]+) from ([0-9\.]+)') }}
+        invalid_users: "{{ ssh_logs.stdout | regex_findall('Invalid user [A-Za-z0-9_\\-]+ from ([0-9\\.]+)') }}"
 
     - name: Detect successful logins
       set_fact:
-        accepted_attempts: >-
-          {{ ssh_logs.stdout | regex_findall('Accepted (?:password|publickey) for .* from ([0-9\.]+)') }}
+        accepted_attempts: "{{ ssh_logs.stdout | regex_findall('Accepted (?:password|publickey) for .* from ([0-9\\.]+)') }}"
 
     - name: Filter successful logins from unknown IPs
+      shell: |
+        python3 << 'EOF'
+        import ipaddress
+        import json
+        
+        accepted = {{ accepted_attempts | to_json }}
+        allowed_networks = {{ allowed_ips | to_json }}
+        
+        suspicious = []
+        for ip in accepted:
+            ip_obj = ipaddress.ip_address(ip)
+            is_allowed = False
+            for network_str in allowed_networks:
+                network = ipaddress.ip_network(network_str, strict=False)
+                if ip_obj in network:
+                    is_allowed = True
+                    break
+            if not is_allowed:
+                suspicious.append(ip)
+        
+        print(json.dumps(suspicious))
+        EOF
+      register: suspicious_result
+      changed_when: false
+
+    - name: Set suspicious success list
       set_fact:
-        suspicious_success: >-
-          {{ accepted_attempts | reject('ipaddr', allowed_ips) | list }}
+        suspicious_success: "{{ suspicious_result.stdout | from_json }}"
 
     - name: Display intrusion summary
       debug:
