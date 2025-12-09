@@ -14,7 +14,7 @@
       ignore_errors: true
 
     - name: Search Log History for suspicious IPs
-      shell: sudo grep "Accepted password" /var/log/auth.log | grep -E -v "10.0.0|192.168.0"
+      shell: sudo grep "Accepted password" /var/log/auth.log | grep -E -v "10.0.0|192.168.0" | grep -v -f /tmp/prod_hosts_to_exclude.txt
 #      shell: grep "Accepted password" /var/log/auth.log | grep -E "45\.159\.98\.145|45\.159\.97\.233|5\.161\.218\.233|192\.73\.242"
       register: password_accepted
       changed_when: false
@@ -22,7 +22,7 @@
       ignore_errors: true
 
     - name: Search Log History for Accepted Public Key
-      shell: sudo grep "Accepted publickey" /var/log/auth.log | grep -E -v "10.0.0|192.168.0"
+      shell: sudo grep "Accepted publickey" /var/log/auth.log | grep -E -v "10.0.0|192.168.0" | grep -v -f /tmp/prod_hosts_to_exclude.txt
 #      shell: sudo grep "Accepted publickey" /var/log/auth.log  | grep -E "45\.159\.98\.145|45\.159\.97\.233|5\.161\.218\.233|209\.177\.156|199\.38\.162|192\.73\.242|68\.183\.90"
       register: public_key
       changed_when: false
