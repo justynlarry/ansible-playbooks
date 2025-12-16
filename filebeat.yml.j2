@@ -1,0 +1,81 @@
+# filebeat.yml.j2
+# Jinja2 template for Filebeat configuration
+
+###################### Filebeat Configuration #########################
+
+# ============================== Filebeat inputs ===============================
+filebeat.inputs:
+  - type: log
+    enabled: false
+    paths:
+      - /var/log/*.log
+
+# ============================== Filebeat modules ==============================
+filebeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: true
+  reload.period: 10s
+
+# ================================== General ===================================
+name: {{ ansible_hostname }}
+tags: ["security-monitoring", "{{ ansible_distribution }}"]
+
+fields:
+  environment: production
+  datacenter: {{ datacenter | default('dc1') }}
+
+# ================================== Outputs ===================================
+
+# ---------------------------- Elasticsearch Output ----------------------------
+output.elasticsearch:
+  hosts: ["{{ elasticsearch_host }}"]
+  
+  # Optional: Use these if you have authentication enabled
+  # username: "elastic"
+  # password: "changeme"
+  
+  # Index naming
+  indices:
+    - index: "filebeat-security-%{+yyyy.MM.dd}"
+      when.or:
+        - equals:
+            event.module: "system"
+        - equals:
+            event.module: "auditd"
+    - index: "filebeat-%{[agent.version]}-%{+yyyy.MM.dd}"
+
+# ------------------------------ Logstash Output -------------------------------
+# Uncomment if you want to use Logstash instead
+# output.logstash:
+#   hosts: ["localhost:5044"]
+
+# ================================= Processors =================================
+processors:
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - add_kubernetes_metadata: ~
+  
+  # Add custom fields for dashboard filtering
+  - add_fields:
+      target: ''
+      fields:
+        log_type: security
+
+  # Drop debug level logs to reduce volume
+  - drop_event:
+      when:
+        equals:
+          log.level: debug
+
+# ================================== Kibana ====================================
+setup.kibana:
+  host: "{{ kibana_host }}"
+
+# ============================== Instrumentation ===============================
+instrumentation:
+  enabled: false
+
+# ================================= Migration ==================================
+migration.6_to_7.enabled: true
