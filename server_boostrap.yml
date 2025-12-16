@@ -1,0 +1,121 @@
+---
+# Bootstrap Proxmox nodes with Ansible user
+# Run this FIRST on fresh Proxmox nodes that only have root access
+
+- name: Bootstrap Proxmox Nodes
+  hosts: proxmox_nodes
+  become: no  # Already logging in as root
+  gather_facts: yes
+  
+  vars:
+    ansible_user_name: "ansbl-user"
+    ansible_user_uid: 2000
+    ansible_user_shell: "/bin/bash"
+    # SSH key will be read from local file
+    
+  tasks:
+    # ===== System Updates =====
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      when: ansible_os_family == "Debian"
+
+    - name: Install essential packages
+      apt:
+        name:
+          - sudo
+          - python3
+          - python3-apt
+          - openssh-server
+          - curl
+          - vim
+        state: present
+      when: ansible_os_family == "Debian"
+
+    # ===== Create Ansible User =====
+    - name: Create ansible user group
+      group:
+        name: "{{ ansible_user_name }}"
+        gid: "{{ ansible_user_uid }}"
+        state: present
+
+    - name: Create ansible user
+      user:
+        name: "{{ ansible_user_name }}"
+        uid: "{{ ansible_user_uid }}"
+        group: "{{ ansible_user_name }}"
+        groups: sudo
+        shell: "{{ ansible_user_shell }}"
+        create_home: yes
+        state: present
+        comment: "Ansible Automation User"
+
+    - name: Set up authorized keys for ansible user
+      authorized_key:
+        user: "{{ ansible_user_name }}"
+        state: present
+        key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/ansible.pub') }}"
+        exclusive: no
+
+    # ===== Configure Sudo =====
+    - name: Allow ansible user to sudo without password
+      copy:
+        content: |
+          # Allow ansible user to run all commands without password
+          {{ ansible_user_name }} ALL=(ALL) NOPASSWD:ALL
+        dest: "/etc/sudoers.d/{{ ansible_user_name }}"
+        owner: root
+        group: root
+        mode: '0440'
+        validate: '/usr/sbin/visudo -cf %s'
+
+    # ===== SSH Hardening (Optional but Recommended) =====
+    - name: Configure SSH for better security
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        state: present
+        backup: yes
+      loop:
+        - { regexp: '^#?PermitRootLogin', line: 'PermitRootLogin prohibit-password' }
+        - { regexp: '^#?PubkeyAuthentication', line: 'PubkeyAuthentication yes' }
+        - { regexp: '^#?PasswordAuthentication', line: 'PasswordAuthentication no' }
+      notify: restart sshd
+
+    # ===== Verify Setup =====
+    - name: Test sudo access for ansible user
+      command: sudo -l -U {{ ansible_user_name }}
+      register: sudo_test
+      changed_when: false
+
+    - name: Display sudo test results
+      debug:
+        msg: "Ansible user sudo configuration: {{ sudo_test.stdout }}"
+
+  handlers:
+    - name: restart sshd
+      service:
+        name: sshd
+        state: restarted
+
+# ===== Post-Bootstrap Verification =====
+- name: Verify Ansible User Access
+  hosts: proxmox_nodes
+  become: yes
+  # This play will use the newly created ansible user
+  gather_facts: no
+  
+  tasks:
+    - name: Test connection with new ansible user
+      ping:
+
+    - name: Verify sudo works
+      command: whoami
+      register: whoami_result
+      changed_when: false
+
+    - name: Display verification
+      debug:
+        msg: "Successfully connected as {{ ansible_user_id }}, sudo gives us: {{ whoami_result.stdout }}"
