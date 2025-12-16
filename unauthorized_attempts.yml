@@ -60,10 +60,8 @@
         python3 << 'EOF'
         import ipaddress
         import json
-        
         accepted = {{ accepted_attempts | to_json }}
         allowed_networks = {{ allowed_ips | to_json }}
-        
         suspicious = []
         for ip in accepted:
             ip_obj = ipaddress.ip_address(ip)
@@ -75,7 +73,6 @@
                     break
             if not is_allowed:
                 suspicious.append(ip)
-        
         print(json.dumps(suspicious))
         EOF
       register: suspicious_result

@@ -1,0 +1,186 @@
+---
+
+# Ansible Playbook:  Deploy filebeat with Security Monitoring
+# Configures hosts for authentication, sudo, and command tracking
+
+- name: Deploy Filebeat Security Monitoring Stack
+  hosts: all
+  become: yes
+  vars:
+    elasticsearch_host: "10.0.10.50:9200"
+    kibana_host: "10.0.10.50:5601"
+    filebeat_version: "8.19.8"
+  
+  tasks:
+    # === Install Dependencies ===
+    - name: Install required packages
+      apt:
+        name:
+          - apt-transport-https
+          - wget
+          - auditd
+          - audispd-plugins
+        state: present
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+    
+    - name: Install required packages (Redhat)
+      yum:
+        name:
+          - wget
+          - auditd
+          - audispd-plugins
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    # === Install Filebeat ===
+    - name: Add Elastic GPG key
+      apt_key:
+        url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Add Elastic repository
+      apt_repository:
+        repo: "deb https://artifacts.elastic.co/packages/8.x/apt stable main"
+        state: present
+      when: ansible_os_family == "Debian"
+    
+    - name: Install Filebeat (Debian/Ubuntu)
+      apt:
+        namne: filebeat
+        state: present
+        update_cache: yes
+
+    - name: Install Filebeat (RedHat CentOS)
+      yum:
+        name: filebeat
+        state: present
+      when: ansible_os_family == "RedHat"
+    
+    # === Configure Auditd Rules ===
+    - name: Create audit rules for security Monitoring
+      copy:
+        dest: /etc/audit/rules.d/security-monitoring.rules
+        content: |
+          # Monitor Sudo Usage
+          -w /usr/bin/sudo -p x -k sudo_execution
+          -w /etc/sudoers -p wa -k sudoers_changes
+          -w /etc/sudoers.d/ -p wa -k sudoers_changes
+
+          # Monitor privilege escalation
+          -w /bin/su -p x -k sudo_execution
+
+          # Monitor user/group changes
+          -w /etc/passwd -p wa -k user_modification
+          -w /etc/group -p wa -k group_modification
+          -w /etc/shadow -p wa -k shadow_modification
+
+          # Monitor authentication
+          -w /etc/pamd.d/ -; wa -k pam_modification
+
+          # Montior sensitive file access
+          -w /etc/ssh/sshd_config -p wa -k sshd_config_change
+
+      notify: restart auditd
+    
+    # === Configure Filebeat ===
+    - name: Configure Filebeat main Config
+      template:
+        src: filebeat.yml.j2
+        dest: /etc/filebeat/filebeat.yml
+        owner: root
+        group: root
+        mode: '0600'
+      notify: restart filebeat
+
+    - name: Enable Filebeat system module
+      command: filebeat modules enable system
+      args:
+        creates: /etc/filebeat/modules.d/system.yml.disabled
+      notify: restart filebeat
+    
+    - name: Enable Filebeat auditd module
+      command: filebeat modules enable auditd
+      args:
+        creates: /etc/filebeat/modules.d/autid.yml.disabled
+      notify: restart filebeat
+
+    - name: Configure system module
+      copy:
+        dest: /etc/filebeat/modules.d/system.yml
+        content: |
+          - module: system
+            syslog:
+              enabled: true
+              var.paths: ["/var/log/syslog*", "/var/log/messages*"]
+            
+            auth:
+              enabled: true
+              var.paths:
+                - "/var/log/auth.log*"
+                - "/var/log/secure*"
+      notify: restart filebeat
+
+    - name: Configure auditd module
+      copy:
+        dest: /etc/filebeat/modules.d/auditd.yml
+        content: |
+          - module: auditd
+            log:
+              enabled: true
+              var.paths: ["/var/log/audity/audit.log*"]
+      notify: restart filebeat
+
+    # === Start Services ===
+    - name: Enable and start auditd
+      systemd:
+        name: auditd
+        enabled: yes
+        state: started
+
+    - name: Enable and start filebeat
+      systemd:
+        name: filebeat
+        enabled: yes
+        state: started
+    
+    # === Verify Setup ===
+    - name: Test Filebeat Configuration
+      command: filebeat test config
+      register: config_test
+      failed_when: config_test.rc !=0
+
+    - name: Test Elasticsearch output
+      command: filebeat test output
+      register: output_test
+      failed_when: output_test.rc !=0
+      ignore_errors: yes
+
+  handlers:
+    - name: restart auditd
+      systemd:
+        name: auditd
+        state: restarted
+
+    - name: restart filebeat
+      systemd:
+        name: filebeat
+        state: restarted
+# === Additional playbook for setting up index Templates
+- name: Setup Elasticsearch index templates and dashboards
+  hosts: localhost
+  connection: local
+  become: no
+  vars:
+    elasticsearch_host: "10.0.10.50:9200"
+    kibana_host: "10.0.10.50:5601"
+
+  tasks:
+    - name: Load filebeat Dashboards into kibana
+      command: >
+        filebeat setup --dashboards
+        -E setup.kibana.host={{ kibana_host }}
+        -E output.elasticsearch.hosts=["{{ elasticsearch_host }}"]
+      delegate_to: "{{ groups['monitored_hosts'][0] }}"
+      run_once: true

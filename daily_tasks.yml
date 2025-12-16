@@ -92,6 +92,7 @@
           {% for host in ansible_play_hosts %}
           {% if hostvars[host].reboot_required_file.stat.exists %}
             - {{ hostvars[host].ansible_hostname }} ({{ host }})
+          {% endif %}
           {% endfor %}
         dest: "/tmp/reboot_notification_{{ current_datetime }}.txt"
       delegate_to: localhost
