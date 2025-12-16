@@ -1,24 +1,35 @@
 ---
-# Bootstrap Proxmox nodes with Ansible user
-# Run this FIRST on fresh Proxmox nodes that only have root access
+# Universal Bootstrap Playbook
+# Handles BOTH root-only systems (Proxmox) AND systems with existing regular users (Debian)
 
-- name: Bootstrap Proxmox Nodes
-  hosts: proxmox_nodes
-  become: no  # Already logging in as root
+- name: Bootstrap All Systems - Create Ansible User
+  hosts: bootstrap_all
+  # Don't set become here - we'll handle it per-task
   gather_facts: yes
   
   vars:
     ansible_user_name: "ansbl-user"
     ansible_user_uid: 2000
     ansible_user_shell: "/bin/bash"
-    # SSH key will be read from local file
     
   tasks:
+    # ===== Determine if we need become =====
+    - name: Check if we're running as root
+      set_fact:
+        need_become: "{{ ansible_user_id != 'root' }}"
+    
+    - name: Display connection info
+      debug:
+        msg: |
+          Connected to {{ inventory_hostname }} as {{ ansible_user_id }}
+          Need to use become: {{ need_become }}
+
     # ===== System Updates =====
     - name: Update apt cache
       apt:
         update_cache: yes
         cache_valid_time: 3600
+      become: "{{ need_become }}"
       when: ansible_os_family == "Debian"
 
     - name: Install essential packages
@@ -30,15 +41,31 @@
           - openssh-server
           - curl
           - vim
+          - acl  # Needed for Ansible's become_user
         state: present
+      become: "{{ need_become }}"
       when: ansible_os_family == "Debian"
 
-    # ===== Create Ansible User =====
+    # ===== Check if ansible user already exists =====
+    - name: Check if ansible user exists
+      shell: "id {{ ansible_user_name }}"
+      register: user_exists
+      failed_when: false
+      changed_when: false
+      become: "{{ need_become }}"
+
+    - name: Display user check result
+      debug:
+        msg: "User {{ ansible_user_name }} {{ 'already exists' if user_exists.rc == 0 else 'will be created' }}"
+
+    # ===== Create Ansible User (only if doesn't exist) =====
     - name: Create ansible user group
       group:
         name: "{{ ansible_user_name }}"
         gid: "{{ ansible_user_uid }}"
         state: present
+      become: "{{ need_become }}"
+      when: user_exists.rc != 0
 
     - name: Create ansible user
       user:
@@ -50,6 +77,18 @@
         create_home: yes
         state: present
         comment: "Ansible Automation User"
+      become: "{{ need_become }}"
+      when: user_exists.rc != 0
+
+    # ===== Set up SSH key (always run, in case key changed) =====
+    - name: Ensure .ssh directory exists
+      file:
+        path: "/home/{{ ansible_user_name }}/.ssh"
+        state: directory
+        owner: "{{ ansible_user_name }}"
+        group: "{{ ansible_user_name }}"
+        mode: '0700'
+      become: "{{ need_become }}"
 
     - name: Set up authorized keys for ansible user
       authorized_key:
@@ -57,8 +96,15 @@
         state: present
         key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/ansible.pub') }}"
         exclusive: no
+      become: "{{ need_become }}"
 
     # ===== Configure Sudo =====
+    - name: Check if sudoers.d file exists
+      stat:
+        path: "/etc/sudoers.d/{{ ansible_user_name }}"
+      register: sudoers_file
+      become: "{{ need_become }}"
+
     - name: Allow ansible user to sudo without password
       copy:
         content: |
@@ -69,43 +115,62 @@
         group: root
         mode: '0440'
         validate: '/usr/sbin/visudo -cf %s'
+      become: "{{ need_become }}"
+      when: not sudoers_file.stat.exists
 
-    # ===== SSH Hardening (Optional but Recommended) =====
-    - name: Configure SSH for better security
-      lineinfile:
-        path: /etc/ssh/sshd_config
-        regexp: "{{ item.regexp }}"
-        line: "{{ item.line }}"
-        state: present
-        backup: yes
-      loop:
-        - { regexp: '^#?PermitRootLogin', line: 'PermitRootLogin prohibit-password' }
-        - { regexp: '^#?PubkeyAuthentication', line: 'PubkeyAuthentication yes' }
-        - { regexp: '^#?PasswordAuthentication', line: 'PasswordAuthentication no' }
-      notify: restart sshd
+    # ===== SSH Hardening (Optional - commented out for safety) =====
+    # Uncomment these if you want to enforce key-only auth
+    # - name: Configure SSH for better security
+    #   lineinfile:
+    #     path: /etc/ssh/sshd_config
+    #     regexp: "{{ item.regexp }}"
+    #     line: "{{ item.line }}"
+    #     state: present
+    #     backup: yes
+    #   loop:
+    #     - { regexp: '^#?PermitRootLogin', line: 'PermitRootLogin prohibit-password' }
+    #     - { regexp: '^#?PubkeyAuthentication', line: 'PubkeyAuthentication yes' }
+    #     - { regexp: '^#?PasswordAuthentication', line: 'PasswordAuthentication no' }
+    #   become: "{{ need_become }}"
+    #   notify: restart sshd
 
     # ===== Verify Setup =====
     - name: Test sudo access for ansible user
       command: sudo -l -U {{ ansible_user_name }}
       register: sudo_test
       changed_when: false
+      become: "{{ need_become }}"
 
     - name: Display sudo test results
       debug:
-        msg: "Ansible user sudo configuration: {{ sudo_test.stdout }}"
+        msg: "Ansible user sudo configuration verified"
+
+    - name: Test SSH key authentication
+      command: su - {{ ansible_user_name }} -c 'whoami'
+      register: su_test
+      changed_when: false
+      become: "{{ need_become }}"
+
+    - name: Display test results
+      debug:
+        msg: "Successfully created/verified {{ ansible_user_name }} on {{ inventory_hostname }}"
 
   handlers:
     - name: restart sshd
       service:
         name: sshd
         state: restarted
+      become: "{{ need_become }}"
 
 # ===== Post-Bootstrap Verification =====
-- name: Verify Ansible User Access
-  hosts: proxmox_nodes
+- name: Verify Ansible User Access on All Systems
+  hosts: bootstrap_all
   become: yes
-  # This play will use the newly created ansible user
   gather_facts: no
+  vars:
+    # Override connection to use new ansible user
+    ansible_user: ansbl-user
+    ansible_ssh_private_key_file: ~/.ssh/ansible
   
   tasks:
     - name: Test connection with new ansible user
@@ -118,4 +183,20 @@
 
     - name: Display verification
       debug:
-        msg: "Successfully connected as {{ ansible_user_id }}, sudo gives us: {{ whoami_result.stdout }}"
+        msg: "✓ Successfully connected to {{ inventory_hostname }} as {{ ansible_user }}, sudo works ({{ whoami_result.stdout }})"
+
+    - name: Get system info
+      setup:
+        gather_subset:
+          - '!all'
+          - '!min'
+          - network
+      register: system_info
+
+    - name: Summary
+      debug:
+        msg:
+          - "Host: {{ inventory_hostname }}"
+          - "IP: {{ ansible_default_ipv4.address }}"
+          - "OS: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+          - "Status: ✓ Ready for automation"
