@@ -199,7 +199,7 @@
 - name: Setup Elasticsearch index templates and dashboards
   hosts: localhost
   connection: local
-  become: no
+  become: yes
   vars:
     elasticsearch_host: "10.0.10.50:9200"
     kibana_host: "10.0.10.50:5601"
@@ -212,7 +212,7 @@
 
     - name: Load Filebeat dashboards into Kibana
       command: >
-        filebeat setup --dashboards
+        /usr/bin/filebeat setup --dashboards
         -E setup.kibana.host={{ kibana_host }}
         -E output.elasticsearch.hosts=["{{ elasticsearch_host }}"]
       delegate_to: "{{ first_host }}"
