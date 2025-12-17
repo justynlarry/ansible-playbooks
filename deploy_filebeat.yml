@@ -83,6 +83,9 @@
       copy:
         dest: /etc/audit/rules.d/security-monitoring.rules
         content: |
+          # Capture Command Execution
+          -a always,exit -F arch=b64 -S execve -k exec
+          -a always,exit -F arch=b32 -S execve -k exec
           # Monitor sudo usage
           -w /usr/bin/sudo -p x -k sudo_execution
           -w /etc/sudoers -p wa -k sudoers_changes
@@ -186,9 +189,7 @@
 
   handlers:
     - name: restart auditd
-      systemd:
-        name: auditd
-        state: restarted
+      command: /sbin/augenrules --load
 
     - name: restart filebeat
       systemd:

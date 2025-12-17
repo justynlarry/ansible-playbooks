@@ -69,6 +69,11 @@ processors:
         equals:
           log.level: debug
 
+  # Add Process Metadata
+  - add_process_metadata:
+      match_pids: ["process.pid"]
+      target: process
+
 # ================================== Kibana ====================================
 setup.kibana:
   host: "{{ kibana_host }}"
