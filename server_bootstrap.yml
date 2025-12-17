@@ -1,6 +1,8 @@
 ---
 # Universal Bootstrap Playbook
 # Handles BOTH root-only systems (Proxmox) AND systems with existing regular users (Debian)
+# Correct Run Command:  ansible-playbook server_bootstrap.yml -i inventories/server_bootstrap.ini --ask-pass --ask-become-pass
+
 
 - name: Bootstrap All Systems - Create Ansible User
   hosts: bootstrap_all
