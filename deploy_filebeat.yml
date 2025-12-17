@@ -156,10 +156,11 @@
 
     # ===== Start Services =====
     - name: Enable and start auditd
-      systemd:
-        name: auditd
-        enabled: yes
-        state: started
+      shell: |
+        systemctl unmask audit-rules.service
+        systemctl reset-failed auditd
+        systemctl start auditd || service auditd start
+      ignore_errors: yes
 
     - name: Enable and start filebeat
       systemd:
@@ -189,8 +190,11 @@
 
   handlers:
     - name: restart auditd
-      command: /sbin/augenrules --load
-
+      shell: |
+        /sbin/augenrules --load
+        systemctl reset-failed auditd
+        systemctl restart auditd || (pkill -9 auditd && systemctl start auditd)
+        
     - name: restart filebeat
       systemd:
         name: filebeat
