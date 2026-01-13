@@ -31,7 +31,7 @@
 
     - name: Load additional allowed IPs from file (if exists)
       set_fact:
-        extra_allowed_ips: "{{ lookup('file', '/tmp/prod_hosts_to_exclude.txt', errors='ignore').split('\n') | select() | list }}"
+        extra_allowed_ips: "{{ (lookup('file', '/tmp/prod_hosts_to_exclude.txt', errors='ignore') or '').split('\n') | select() | list }}"
       failed_when: false
 
     - name: Combine base and extra allowed IPs
