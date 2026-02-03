@@ -1,7 +1,7 @@
 ---
 
 - name: System-Wide Controlled Reboot
-  hosts:  all
+  hosts:  ubuntu
   become: true
   serial: 1
   tasks:
